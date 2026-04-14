@@ -7,6 +7,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
 from rest_framework.authtoken.views import ObtainAuthToken
 from .serializers import RegistrationSerializer
+from rest_framework.response import Response
+from rest_framework import status
+from django.contrib.auth import authenticate
+from rest_framework.authtoken.models import Token
 
 
 class UserProfileList(generics.ListCreateAPIView):
@@ -43,23 +47,32 @@ class RegistrationView(APIView):
         return Response(data)
 
 
-class CustomLoginView(ObtainAuthToken):
-    permission_classes = [AllowAny]
+class LoginView(APIView):
+    permission_classes = []
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        email = request.data.get('email')
+        password = request.data.get('password')
 
-        data = {}
-        if serializer.is_valid():
-            user = serializer.validated_data['user']
-            token, created = Token.objects.get_or_create(user=user)
-            data = {
-                'token': token.key,
-                'username': user.username,
-                'email': user.email
-            }
+        if not email or not password:
+            return Response(
+                {"error": "Email and password required"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        else:
-            data = serializer.errors
+        user = authenticate(username=email, password=password)
 
-        return Response(data)
+        if not user:
+            return Response(
+                {"error": "Invalid credentials"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        token, _ = Token.objects.get_or_create(user=user)
+
+        return Response({
+            "token": token.key,
+            "fullname": user.first_name,
+            "email": user.email,
+            "user_id": user.id
+        }, status=status.HTTP_200_OK)
