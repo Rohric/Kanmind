@@ -5,12 +5,12 @@ from django.contrib.auth.models import User
 
 
 class Board(models.Model):
-    name = models.CharField(max_length=100)
-    description = models.TextField(blank=True, null=True)
-    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    title = models.CharField(max_length=100)
+    owner = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='owned_boards')
 
     def __str__(self):
-        return self.name
+        return self.title
 
 
 class BoardMembership(models.Model):
@@ -21,10 +21,14 @@ class BoardMembership(models.Model):
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    board = models.ForeignKey(Board, on_delete=models.CASCADE)
+    board = models.ForeignKey(
+        Board, on_delete=models.CASCADE, related_name='memberships')
 
     role = models.CharField(max_length=10, choices=ROLE_CHOICES)
-    joined_date = models.DateField(auto_now_add=True)
+    joined_at = models.DateField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ['user', 'board']
 
     def __str__(self):
-        return f"{self.user.username} ({self.board.name})"
+        return f"{self.user} - {self.board} ({self.role})"
