@@ -8,6 +8,12 @@ from board_app.models import Board, BoardMembership
 #         fields = ['name', 'description', 'owner']
 
 
+class BoardMembershipSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BoardMembership
+        fields = ['user', 'board', 'role']
+
+
 class BoardSerializer(serializers.ModelSerializer):
     members = serializers.ListField(
         child=serializers.IntegerField(),
@@ -28,20 +34,30 @@ class BoardSerializer(serializers.ModelSerializer):
         members = validated_data.pop('members')
         user = self.context['request'].user
 
-        board = Board.objects.create(owner=user, **validated_data)
+        board = self._create_board(validated_data, user)
+        self._handle_members(board, user.id, members)
 
+        return board
+
+    def _create_board(self, data, user):
+        return Board.objects.create(owner=user, **data)
+
+    def _handle_members(self, board, owner_id, members):
+        self._add_owner(board, owner_id)
+        self._add_members(board, owner_id, members)
+
+    def _add_owner(self, board, owner_id):
         BoardMembership.objects.create(
-            user=user,
+            user_id=owner_id,
             board=board,
             role='owner'
         )
 
-        for user_id in members:
-            if user_id != user.id:
+    def _add_members(self, board, owner_id, members):
+        for user_id in set(members):
+            if user_id != owner_id:
                 BoardMembership.objects.create(
                     user_id=user_id,
                     board=board,
-                    role='editor'
+                    role='member'
                 )
-
-        return board

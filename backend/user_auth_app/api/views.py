@@ -30,22 +30,18 @@ class RegistrationView(APIView):
     def post(self, request):
         serializer = RegistrationSerializer(data=request.data)
 
-        data = {}
-
         if serializer.is_valid():
-            saved_account = serializer.save()
-            token, created = Token.objects.get_or_create(user=saved_account)
-            data = {
+            user = serializer.save()
+            token, _ = Token.objects.get_or_create(user=user)
+
+            return Response({
                 'token': token.key,
-                'fullname': saved_account.first_name,
-                'email': saved_account.email,
-                'user_id': saved_account.id
-            }
+                'fullname': user.first_name,
+                'email': user.email,
+                'user_id': user.id
+            }, status=201)
 
-        else:
-            data = serializer.errors
-
-        return Response(data)
+        return Response(serializer.errors, status=400)
 
 
 class LoginView(APIView):
@@ -81,6 +77,10 @@ class LoginView(APIView):
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
+
+    # def post(self, request):
+    #     request.user.auth_token.delete()  # Token löschen
+    #     return Response({"detail": "Logout erfolgreich. Token wurde gelöscht."}, status=status.HTTP_200_OK)
 
     def post(self, request):
         token = getattr(request.user, 'auth_token', None)

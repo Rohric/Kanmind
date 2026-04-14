@@ -16,8 +16,7 @@ class Board(models.Model):
 class BoardMembership(models.Model):
     ROLE_CHOICES = [
         ('owner', 'Owner'),
-        ('editor', 'Editor'),
-        ('viewer', 'Viewer'),
+        ('member', 'Member'),
     ]
 
     user = models.ForeignKey(User, on_delete=models.CASCADE)
