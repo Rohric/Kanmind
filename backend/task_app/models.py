@@ -1,10 +1,6 @@
 from django.db import models
-from django.contrib.auth.models import User
-from board_app.models import Board
 # Create your models here.
 
-
-from django.db import models
 from django.contrib.auth import get_user_model
 
 User = get_user_model()
@@ -25,16 +21,18 @@ class Task(models.Model):
     ]
 
     board = models.ForeignKey(
-        'kanmind_app.Board',
+        'board_app.Board',
         on_delete=models.CASCADE,
         related_name='tasks'
     )
 
-    title = models.CharField(max_length=255)
-    description = models.TextField()
+    title = models.CharField(max_length=255, default='blanc')
+    description = models.TextField(default='blanc')
 
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
-    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default='to-do')
+    priority = models.CharField(
+        max_length=10, choices=PRIORITY_CHOICES, default='medium')
 
     assignee = models.ForeignKey(
         User,
@@ -51,8 +49,6 @@ class Task(models.Model):
     )
 
     due_date = models.DateField(null=True, blank=True)
-
-    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
