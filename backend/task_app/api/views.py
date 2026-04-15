@@ -16,3 +16,17 @@ class TaskList(generics.ListCreateAPIView):
 
         # Ansonsten filtere nach Tasks, deren Board-Mitglied der User ist
         return Task.objects.filter(board__memberships__user=user).distinct()
+
+
+class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # Wenn der User ein Admin ist, zeige ihm alle Tasks
+        if user.is_staff:
+            return Task.objects.all()
+
+        # Ansonsten filtere nach Tasks, deren Board-Mitglied der User ist
+        return Task.objects.filter(board__memberships__user=user).distinct()
