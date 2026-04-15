@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from task_app.models import Task
+from task_app.models import Task, Comment
 from user_auth_app.api.serializers import SimpleUserSerializer
 from django.contrib.auth import get_user_model
 
@@ -33,3 +33,11 @@ class TaskSerializer(serializers.ModelSerializer):
         # Greift auf die 'comment_set' Relation zu, die Django automatisch erstellt
         # wenn kein related_name im ForeignKey des Comment-Modells definiert ist.
         return obj.comment_set.count()
+
+
+class CommentSerializer(serializers.ModelSerializer):
+    author = serializers.CharField(source='user.first_name', read_only=True)
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'created_at', 'author', 'content']
