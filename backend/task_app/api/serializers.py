@@ -19,11 +19,13 @@ class TaskSerializer(serializers.ModelSerializer):
         queryset=User.objects.all(), source='reviewer', write_only=True, required=False, allow_null=True
     )
 
+    board_title = serializers.CharField(source='board.title', read_only=True)
+
     comments_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Task
-        fields = ['id', 'board', 'title', 'description', 'status', 'priority',
+        fields = ['id', 'board', 'board_title', 'title', 'description', 'status', 'priority',
                   'assignee', 'reviewer', 'assignee_id', 'reviewer_id',
                   'due_date', 'comments_count']
 
