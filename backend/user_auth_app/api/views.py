@@ -12,11 +12,24 @@ from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
+from django.contrib.auth.models import User
 
 
 class UserProfileList(generics.ListCreateAPIView):
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
+
+    def get(self, request):
+        print(UserProfile.objects.all())
+        return super().get(request)
+
+
+class UserListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        users = User.objects.all().values('id', 'email', 'username')
+        return Response(list(users))
 
 
 class UserProfileDetail(generics.RetrieveUpdateDestroyAPIView):
