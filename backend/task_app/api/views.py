@@ -10,7 +10,7 @@ from board_app.api.permissions import IsMember
 
 class TaskList(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsMember]
 
     def get_queryset(self):
         user = self.request.user
@@ -20,6 +20,14 @@ class TaskList(generics.ListCreateAPIView):
 
         # Ansonsten filtere nach Tasks, deren Board-Mitglied der User ist
         return Task.objects.filter(board__memberships__user=user).distinct()
+
+    def perform_create(self, serializer):
+        # 1. Das Ziel-Board aus den validierten Daten des Requests holen
+        board = serializer.validated_data['board']
+        # 2. Unsere Permission (IsMember) zwingen, dieses Board zu prüfen (Wirft 403, wenn nicht drin!)
+        self.check_object_permissions(self.request, board)
+        # 3. Wenn kein Fehler geworfen wurde, den Task speichern
+        serializer.save()
 
 
 class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
