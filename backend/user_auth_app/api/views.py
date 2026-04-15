@@ -1,6 +1,6 @@
 from rest_framework import generics
 from user_auth_app.models import UserProfile
-from .serializers import UserProfileSerializer
+from .serializers import UserProfileSerializer, SimpleUserSerializer
 from rest_framework.views import APIView
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
@@ -30,6 +30,12 @@ class UserListView(APIView):
     def get(self, request):
         users = User.objects.all().values('id', 'email', 'username')
         return Response(list(users))
+
+
+class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = User.objects.all()
+    serializer_class = SimpleUserSerializer
 
 
 class UserProfileDetail(generics.RetrieveUpdateDestroyAPIView):
