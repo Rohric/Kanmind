@@ -52,6 +52,14 @@ class Task(models.Model):
 
     due_date = models.DateField(null=True, blank=True,)
 
+    creator = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='creator_tasks'
+    )
+
     def __str__(self):
         return self.title
 

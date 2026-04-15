@@ -5,7 +5,7 @@ from django.db.models import Q
 from task_app.models import Task, Comment
 from .serializers import TaskSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from .permissions import IsAdmin
+from .permissions import IsAdmin, IsTaskCreatorOrBoardOwnerForDelete
 from board_app.api.permissions import IsMember
 
 
@@ -33,7 +33,8 @@ class TaskList(generics.ListCreateAPIView):
 
 class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMember, IsAdmin]
+    permission_classes = [IsAuthenticated, IsMember,
+                          IsTaskCreatorOrBoardOwnerForDelete]
 
     def get_queryset(self):
         user = self.request.user
@@ -48,7 +49,8 @@ class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
 
 class TaskAssigned(generics.ListAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMember, IsAdmin]
+    permission_classes = [IsAuthenticated, IsMember]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -57,7 +59,8 @@ class TaskAssigned(generics.ListAPIView):
 
 class TaskReviewer(generics.ListAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMember, IsAdmin]
+    permission_classes = [IsAuthenticated, IsMember]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
@@ -66,7 +69,8 @@ class TaskReviewer(generics.ListAPIView):
 
 class CommentList(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, IsMember, IsAdmin]
+    permission_classes = [IsAuthenticated, IsMember]
+    permission_classes = [IsAuthenticated, IsMember]
 
     def get_queryset(self):
         task_id = self.kwargs.get('pk')
