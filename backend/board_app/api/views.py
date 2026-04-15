@@ -20,3 +20,9 @@ class BoardsList(generics.ListCreateAPIView):
     serializer_class = BoardSerializer
     permission_classes = [IsAuthenticated]
     # permission_classes = [IsAdminForDeleteOrPatchAndReadOnly]
+
+
+class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Board.objects.all()
+    serializer_class = BoardSerializer
+    permission_classes = [IsAuthenticated]

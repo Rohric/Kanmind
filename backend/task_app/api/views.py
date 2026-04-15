@@ -5,6 +5,14 @@ from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticate
 
 
 class TaskList(generics.ListCreateAPIView):
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    # permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # Wenn der User ein Admin ist, zeige ihm alle Tasks
+        if user.is_staff:
+            return Task.objects.all()
+
+        # Ansonsten filtere nach Tasks, deren Board-Mitglied der User ist
+        return Task.objects.filter(board__memberships__user=user).distinct()
