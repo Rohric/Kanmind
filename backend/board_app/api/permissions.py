@@ -29,6 +29,11 @@ class IsOwnerOrAdmin(BasePermission):
             return bool(request.user and request.user == obj.user)
 
 
+class IsAdmin(BasePermission):
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_superuser)
+
+
 class IsMember(BasePermission):
     def has_object_permission(self, request, view, obj):
         # Admins haben automatisch Zugriff, auch wenn sie keine Member sind
