@@ -2,15 +2,11 @@ from rest_framework import generics
 from user_auth_app.models import UserProfile
 from .serializers import UserProfileSerializer, SimpleUserSerializer
 from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
-from rest_framework.authtoken.views import ObtainAuthToken
 from .serializers import RegistrationSerializer
-from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
-from rest_framework.authtoken.models import Token
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.contrib.auth.models import User
 
@@ -20,7 +16,6 @@ class UserProfileList(generics.ListCreateAPIView):
     serializer_class = UserProfileSerializer
 
     def get(self, request):
-        print(UserProfile.objects.all())
         return super().get(request)
 
 
@@ -97,14 +92,10 @@ class LoginView(APIView):
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
 
-    # def post(self, request):
-    #     request.user.auth_token.delete()  # Token löschen
-    #     return Response({"detail": "Logout erfolgreich. Token wurde gelöscht."}, status=status.HTTP_200_OK)
-
     def post(self, request):
         token = getattr(request.user, 'auth_token', None)
 
-        if token:          # Token löschen
+        if token:
             token.delete()
 
         return Response({"detail": "Logout erfolgreich. Token wurde gelöscht."}, status=status.HTTP_200_OK)

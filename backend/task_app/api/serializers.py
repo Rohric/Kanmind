@@ -8,11 +8,9 @@ User = get_user_model()
 
 
 class TaskSerializer(serializers.ModelSerializer):
-    # Für die Antwort (Read-Only): Wir nutzen den neuen Serializer für die verschachtelte Darstellung
     assignee = SimpleUserSerializer(read_only=True)
     reviewer = SimpleUserSerializer(read_only=True)
 
-    # Für den Request (Write-Only): Wir akzeptieren die IDs, so wie im Postman-Body verlangt
     assignee_id = serializers.PrimaryKeyRelatedField(
         queryset=User.objects.all(), source='assignee', write_only=True, required=False, allow_null=True
     )
@@ -31,12 +29,9 @@ class TaskSerializer(serializers.ModelSerializer):
                   'due_date', 'comments_count']
 
     def get_comments_count(self, obj):
-        # Greift auf die 'comment_set' Relation zu, die Django automatisch erstellt
-        # wenn kein related_name im ForeignKey des Comment-Modells definiert ist.
         return obj.comment_set.count()
 
     def validate(self, data):
-        # Hole das Board aus dem Request oder (beim Updaten) aus dem bestehenden Task
         board = data.get('board')
         if not board and self.instance:
             board = self.instance.board

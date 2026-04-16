@@ -4,18 +4,6 @@ from task_app.api.serializers import TaskSerializer
 from user_auth_app.api.serializers import SimpleUserSerializer
 
 
-# class BoardSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Board
-#         fields = ['name', 'description', 'owner']
-
-
-class BoardMembershipSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = BoardMembership
-        fields = ['user', 'board', 'role']
-
-
 class BoardDetailSerializer(serializers.ModelSerializer):
     owner_id = serializers.IntegerField(source='owner.id', read_only=True)
     members = serializers.SerializerMethodField()
@@ -26,7 +14,6 @@ class BoardDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'owner_id', 'members', 'tasks']
 
     def get_members(self, obj):
-        # obj ist die Board-Instanz. Wir holen alle User aus dem "through"-Modell 'BoardMembership'
         users = [membership.user for membership in obj.memberships.all()]
         serializer = SimpleUserSerializer(
             users, many=True, context=self.context)
@@ -41,14 +28,10 @@ class BoardSerializer(serializers.ModelSerializer):
 
     member_count = serializers.SerializerMethodField()
     owner_id = serializers.IntegerField(source='owner.id', read_only=True)
-    ticket_count = serializers.SerializerMethodField()
-    tasks_to_do_count = serializers.SerializerMethodField()
-    tasks_high_prio_count = serializers.SerializerMethodField()
 
     class Meta:
         model = Board
-        fields = ['id', 'title', 'members', 'member_count', 'ticket_count',
-                  'tasks_to_do_count', 'tasks_high_prio_count', 'owner_id']
+        fields = ['id', 'title', 'members', 'member_count', 'owner_id']
 
     def get_member_count(self, obj):
         return obj.memberships.count()
@@ -82,14 +65,4 @@ class BoardSerializer(serializers.ModelSerializer):
                 BoardMembership.objects.create(
                     user_id=user_id,
                     board=board,
-                    role='member'
-                )
-
-    def get_ticket_count(self, obj):
-        return 0
-
-    def get_tasks_to_do_count(self, obj):
-        return 0
-
-    def get_tasks_high_prio_count(self, obj):
-        return 0
+                    role='member')

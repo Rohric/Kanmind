@@ -1,9 +1,9 @@
 from rest_framework import generics
 from board_app.models import Board
 from .serializers import BoardSerializer, BoardDetailSerializer
-from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from . permissions import IsAdminForDeleteOrPatchAndReadOnly, IsBoardOwner, IsOwnerOrAdmin, IsMemberOrOwner
-from rest_framework import viewsets, permissions, status
+from rest_framework.permissions import IsAuthenticated
+from . permissions import IsMemberOrOwner
+from rest_framework import permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
@@ -16,13 +16,11 @@ class TestApiView(APIView):
 
 
 class BoardsList(generics.ListCreateAPIView):
-    # queryset = Board.objects.all()
     serializer_class = BoardSerializer
     permission_classes = [IsAuthenticated, IsMemberOrOwner]
 
     def get_queryset(self):
         user = self.request.user
-        # Wenn der User ein Admin ist, zeige ihm alle Tasks
         if user.is_staff:
             return Board.objects.all()
 

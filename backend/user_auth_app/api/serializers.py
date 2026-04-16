@@ -11,11 +11,8 @@ class SimpleUserSerializer(serializers.ModelSerializer):
         fields = ['id', 'email', 'fullname']
 
     def update(self, instance, validated_data):
-        # Wenn die E-Mail geändert wird, müssen wir zwingend auch den username (für den Login) mitziehen!
         if 'email' in validated_data:
             instance.username = validated_data['email']
-
-        # Den Rest der normalen Update-Logik überlassen wir dem ModelSerializer
         return super().update(instance, validated_data)
 
 
