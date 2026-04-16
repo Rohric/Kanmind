@@ -20,11 +20,6 @@ class TaskList(generics.ListCreateAPIView):
 
         return Task.objects.filter(board__memberships__user=user).distinct()
 
-    def perform_create(self, serializer):
-        board = serializer.validated_data['board']
-        self.check_object_permissions(self.request, board)
-        serializer.save(creator=self.request.user)
-
 
 class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskSerializer
@@ -67,12 +62,6 @@ class CommentList(generics.ListCreateAPIView):
         self.check_object_permissions(self.request, task)
 
         return Comment.objects.filter(task=task)
-
-    def perform_create(self, serializer):
-        task_id = self.kwargs.get('pk')
-        task = get_object_or_404(Task, id=task_id)
-        self.check_object_permissions(self.request, task)
-        serializer.save(user=self.request.user, task=task)
 
 
 class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
