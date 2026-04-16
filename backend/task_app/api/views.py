@@ -41,7 +41,7 @@ class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
 
 class TaskAssigned(generics.ListAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsMemberOrOwner]
 
     def get_queryset(self):
         user = self.request.user
@@ -50,7 +50,7 @@ class TaskAssigned(generics.ListAPIView):
 
 class TaskReviewer(generics.ListAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsMemberOrOwner]
 
     def get_queryset(self):
         user = self.request.user
