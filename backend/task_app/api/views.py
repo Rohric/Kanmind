@@ -5,7 +5,7 @@ from django.db.models import Q
 from task_app.models import Task, Comment
 from .serializers import TaskSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
-from .permissions import IsAdmin, IsTaskCreatorOrBoardOwnerForDelete
+from .permissions import IsAdmin, IsCreatorOrBoardOwnerForDelete
 from board_app.api.permissions import IsMemberOrOwner
 
 
@@ -33,8 +33,8 @@ class TaskList(generics.ListCreateAPIView):
 
 class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMemberOrOwner,
-                          IsTaskCreatorOrBoardOwnerForDelete]
+    permission_classes = [IsAuthenticated,
+                          IsMemberOrOwner, IsCreatorOrBoardOwnerForDelete]
 
     def get_queryset(self):
         user = self.request.user
@@ -93,3 +93,11 @@ class CommentList(generics.ListCreateAPIView):
 
         # Den Kommentar dem User und der Task zuordnen und speichern
         serializer.save(user=self.request.user, task=task)
+
+
+class CommentDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+    # IsMemberOrOwner schützt vor Fremden, IsCreatorOrBoardOwnerForDelete regelt das Löschen
+    permission_classes = [IsAuthenticated,
+                          IsMemberOrOwner, IsCreatorOrBoardOwnerForDelete]
