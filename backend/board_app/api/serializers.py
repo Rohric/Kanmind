@@ -1,5 +1,7 @@
 from rest_framework import serializers
 from board_app.models import Board, BoardMembership
+from task_app.api.serializers import TaskSerializer
+from user_auth_app.api.serializers import SimpleUserSerializer
 
 
 # class BoardSerializer(serializers.ModelSerializer):
@@ -12,6 +14,23 @@ class BoardMembershipSerializer(serializers.ModelSerializer):
     class Meta:
         model = BoardMembership
         fields = ['user', 'board', 'role']
+
+
+class BoardDetailSerializer(serializers.ModelSerializer):
+    owner_id = serializers.IntegerField(source='owner.id', read_only=True)
+    members = serializers.SerializerMethodField()
+    tasks = TaskSerializer(source='task_set', many=True, read_only=True)
+
+    class Meta:
+        model = Board
+        fields = ['id', 'title', 'owner_id', 'members', 'tasks']
+
+    def get_members(self, obj):
+        # obj ist die Board-Instanz. Wir holen alle User aus dem "through"-Modell 'BoardMembership'
+        users = [membership.user for membership in obj.memberships.all()]
+        serializer = SimpleUserSerializer(
+            users, many=True, context=self.context)
+        return serializer.data
 
 
 class BoardSerializer(serializers.ModelSerializer):

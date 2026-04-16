@@ -1,6 +1,6 @@
 from rest_framework import generics
 from board_app.models import Board
-from .serializers import BoardSerializer
+from .serializers import BoardSerializer, BoardDetailSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from . permissions import IsAdminForDeleteOrPatchAndReadOnly, IsBoardOwner, IsOwnerOrAdmin, IsMemberOrOwner
 from rest_framework import viewsets, permissions, status
@@ -31,5 +31,9 @@ class BoardsList(generics.ListCreateAPIView):
 
 class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Board.objects.all()
-    serializer_class = BoardSerializer
     permission_classes = [IsAuthenticated, IsMemberOrOwner]
+
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return BoardDetailSerializer
+        return BoardSerializer
