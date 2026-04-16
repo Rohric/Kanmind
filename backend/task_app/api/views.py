@@ -6,12 +6,12 @@ from task_app.models import Task, Comment
 from .serializers import TaskSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from .permissions import IsAdmin, IsTaskCreatorOrBoardOwnerForDelete
-from board_app.api.permissions import IsMember
+from board_app.api.permissions import IsMemberOrOwner
 
 
 class TaskList(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMember]
+    permission_classes = [IsAuthenticated, IsMemberOrOwner]
 
     def get_queryset(self):
         user = self.request.user
@@ -28,12 +28,12 @@ class TaskList(generics.ListCreateAPIView):
         # 2. Unsere Permission (IsMember) zwingen, dieses Board zu prüfen (Wirft 403, wenn nicht drin!)
         self.check_object_permissions(self.request, board)
         # 3. Wenn kein Fehler geworfen wurde, den Task speichern
-        serializer.save()
+        serializer.save(creator=self.request.user)
 
 
 class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMember,
+    permission_classes = [IsAuthenticated, IsMemberOrOwner,
                           IsTaskCreatorOrBoardOwnerForDelete]
 
     def get_queryset(self):
@@ -49,28 +49,30 @@ class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
 
 class TaskAssigned(generics.ListAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMember]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(Q(assignee=user) | Q(reviewer=user)).distinct()
+        # Nur Tasks laden, bei denen der User Assignee/Reviewer ist UND Mitglied des Boards ist
+        return Task.objects.filter(
+            Q(assignee=user) | Q(reviewer=user),
+            board__memberships__user=user
+        ).distinct()
 
 
 class TaskReviewer(generics.ListAPIView):
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated, IsMember]
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
-        return Task.objects.filter(Q(reviewer=user)).distinct()
+        # Nur Tasks laden, bei denen der User Reviewer ist UND Mitglied des Boards ist
+        return Task.objects.filter(reviewer=user, board__memberships__user=user).distinct()
 
 
 class CommentList(generics.ListCreateAPIView):
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated, IsMember]
-    permission_classes = [IsAuthenticated, IsMember]
+    permission_classes = [IsAuthenticated, IsMemberOrOwner]
 
     def get_queryset(self):
         task_id = self.kwargs.get('pk')

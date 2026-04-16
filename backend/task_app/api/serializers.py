@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from rest_framework.exceptions import PermissionDenied
 from task_app.models import Task, Comment
 from user_auth_app.api.serializers import SimpleUserSerializer
 from django.contrib.auth import get_user_model
@@ -33,6 +34,24 @@ class TaskSerializer(serializers.ModelSerializer):
         # Greift auf die 'comment_set' Relation zu, die Django automatisch erstellt
         # wenn kein related_name im ForeignKey des Comment-Modells definiert ist.
         return obj.comment_set.count()
+
+    def validate(self, data):
+        # Hole das Board aus dem Request oder (beim Updaten) aus dem bestehenden Task
+        board = data.get('board')
+        if not board and self.instance:
+            board = self.instance.board
+
+        assignee = data.get('assignee')
+        if assignee and board and not board.memberships.filter(user=assignee).exists():
+            raise PermissionDenied(
+                "Verboten. Der Benutzer muss Mitglied des Boards sein, zu dem die Task gehört.")
+
+        reviewer = data.get('reviewer')
+        if reviewer and board and not board.memberships.filter(user=reviewer).exists():
+            raise PermissionDenied(
+                "Verboten. Der Benutzer muss Mitglied des Boards sein, zu dem die Task gehört.")
+
+        return data
 
 
 class CommentSerializer(serializers.ModelSerializer):

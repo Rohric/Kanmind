@@ -34,15 +34,23 @@ class IsAdmin(BasePermission):
         return bool(request.user and request.user.is_superuser)
 
 
-class IsMember(BasePermission):
+class IsMemberOrOwner(BasePermission):
     def has_object_permission(self, request, view, obj):
         # Admins haben automatisch Zugriff, auch wenn sie keine Member sind
-        if request.user and request.user.is_staff:
+        if request.user and request.user.is_superuser:
             return True
 
         # Dynamisch: Erkennt, ob das Objekt selbst ein Board ist, oder (wie z.B. bei Tasks) ein Board als Feld hat
-        board = obj if isinstance(obj, Board) else obj.board
+        is_board_obj = isinstance(obj, Board)
+        board = obj if is_board_obj else obj.board
 
+        # Nur der Owner darf ein Board löschen
+        if is_board_obj and request.method == "DELETE":
+            return board.memberships.filter(user=request.user, role='owner').exists()
+
+        # Für alle anderen Methoden (Ansehen, Bearbeiten von Boards) und für alle Aktionen auf
+        # untergeordneten Objekten (Tasks) wird geprüft, ob der User Mitglied des Boards ist.
+        # Die spezifische Logik (z.B. Task löschen) wird in nachgelagerten Permissions geklärt.
         return board.memberships.filter(user=request.user).exists()
 
 
