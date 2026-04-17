@@ -8,7 +8,16 @@ class IsMemberOrOwner(BasePermission):
             return True
 
         is_board_obj = isinstance(obj, Board)
-        board = obj if is_board_obj else obj.board
+        board = None
+        if is_board_obj:
+            board = obj
+        elif hasattr(obj, 'board'):  # Handles Task objects
+            board = obj.board
+        elif hasattr(obj, 'task') and hasattr(obj.task, 'board'):  # Handles Comment objects
+            board = obj.task.board
+
+        if not board:
+            return False  # Fallback, if no board can be determined
 
         if is_board_obj and request.method == "DELETE":
             return board.memberships.filter(user=request.user, role='owner').exists()

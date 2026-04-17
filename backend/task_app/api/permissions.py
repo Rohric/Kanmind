@@ -1,10 +1,14 @@
 from rest_framework.permissions import BasePermission
+from task_app.models import Comment
 
 
 class IsCreatorOrBoardOwnerForDelete(BasePermission):
     def has_object_permission(self, request, view, obj):
         if request.method != 'DELETE':
             return True
+
+        if isinstance(obj, Comment):
+            return obj.user == request.user
 
         board = obj.board if hasattr(obj, 'board') else obj.task.board
 

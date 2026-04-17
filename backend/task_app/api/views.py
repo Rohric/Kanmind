@@ -57,7 +57,7 @@ class CommentList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsMemberOrOwner]
 
     def get_queryset(self):
-        task_id = self.kwargs.get('pk')
+        task_id = self.kwargs.get('task_id')
         task = get_object_or_404(Task, id=task_id)
         self.check_object_permissions(self.request, task)
 

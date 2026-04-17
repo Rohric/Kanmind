@@ -39,7 +39,6 @@ class TaskSerializer(serializers.ModelSerializer):
 
         request = self.context.get('request')
 
-        # Berechtigungs-Check für Tasks (Erstellen & Bearbeiten): Ist der ausführende User im Board?
         if request and board:
             is_member = board.memberships.filter(user=request.user).exists()
             if not (is_member or request.user.is_superuser):
@@ -49,12 +48,12 @@ class TaskSerializer(serializers.ModelSerializer):
         assignee = data.get('assignee')
         if assignee and board and not (board.memberships.filter(user=assignee).exists() or assignee.is_superuser):
             raise PermissionDenied(
-                "Verboten. Der Benutzer muss Mitglied des Boards sein, zu dem die Task gehört.")
+                "Verboten. Der assignee muss Mitglied des Boards sein, zu dem die Task gehört.")
 
         reviewer = data.get('reviewer')
         if reviewer and board and not (board.memberships.filter(user=reviewer).exists() or reviewer.is_superuser):
             raise PermissionDenied(
-                "Verboten. Der Benutzer muss Mitglied des Boards sein, zu dem die Task gehört.")
+                "Verboten. Der reviewer muss Mitglied des Boards sein, zu dem die Task gehört.")
 
         return data
 
@@ -75,11 +74,9 @@ class CommentSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         view = self.context.get('view')
 
-        # Holt sich dynamisch die ID aus der URL
-        task_id = view.kwargs.get('pk')
+        task_id = view.kwargs.get('task_id')
         task = get_object_or_404(Task, id=task_id)
 
-        # Check, ob der User das Recht hat, in diesem Board zu kommentieren
         is_member = task.board.memberships.filter(user=request.user).exists()
         if not (is_member or request.user.is_superuser):
             raise PermissionDenied(
@@ -92,7 +89,6 @@ class CommentSerializer(serializers.ModelSerializer):
     def update(self, instance, validated_data):
         request = self.context.get('request')
 
-        # Nur der Ersteller des Kommentars darf ihn bearbeiten (z.B. per PATCH)
         if instance.user != request.user and not request.user.is_superuser:
             raise PermissionDenied(
                 "Verboten. Du kannst nur deine eigenen Kommentare bearbeiten.")
