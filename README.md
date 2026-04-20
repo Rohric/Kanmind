@@ -15,7 +15,7 @@ Folge diesen Schritten, um das Projekt lokal aufzusetzen und zu starten:
 ### 1. Repository klonen
 Öffne dein Terminal und klone das Repository:
 ```bash
-git clone <hier-deine-github-repo-url-einfügen>
+git clone https://github.com/Rohric/Kanmind
 cd Kanmind/backend
 ```
 
