@@ -1,6 +1,6 @@
 # Kanmind Backend
 
-Dies ist das Django REST Framework Backend für das **Kanmind** Projekt. Es verwaltet die Datenbank und stellt die API für die Authentifizierung, Boards und Tasks (Aufgaben) bereit.
+Dies ist das Django REST Framework Backend für das **Kanmind**. Es verwaltet die Datenbank und stellt die API für die Authentifizierung, Boards und Tasks (Aufgaben) bereit.
 
 ## 📋 Voraussetzungen
 
