@@ -30,7 +30,7 @@ env\Scripts\activate
 
 **macOS / Linux:**
 ```bash
-python3 -m venv env
+python3 -m env env
 source venv/bin/activate
 ```
 
@@ -64,7 +64,7 @@ Das Backend läuft nun! Du kannst das Admin-Panel im Browser unter `http://127.0
 
 Folgende Haupt-Routen (Endpunkte) stellt diese REST-API zur Verfügung:
 
-- **Authentifizierung / User:** `/api/auth/` (Token-based Auth)
+- **Authentifizierung / User:** `/api/` (Token-based Auth)
 - **Boards:** `/api/boards/`
 - **Aufgaben (Tasks):** `/api/tasks/`
 - **API Auth UI:** `/api-auth/`

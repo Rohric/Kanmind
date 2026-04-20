@@ -21,7 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/boards/', include('board_app.api.urls')),
     path('api/tasks/', include('task_app.api.urls')),
-    path('api/auth/', include('user_auth_app.api.urls')),
+    path('api/', include('user_auth_app.api.urls')),
     path('api-auth', include('rest_framework.urls')),
 
 ]
