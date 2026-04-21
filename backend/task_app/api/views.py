@@ -1,12 +1,16 @@
 from rest_framework import generics
 from django.shortcuts import get_object_or_404
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.response import Response
+from rest_framework import status
 from django.db.models import Q
+from django.http import Http404
 from task_app.models import Task, Comment
 from .serializers import TaskSerializer, CommentSerializer
 from rest_framework.permissions import IsAuthenticated
 from .permissions import IsCreatorOrBoardOwnerForDelete
 from board_app.api.permissions import IsMemberOrOwner
+from board_app.api.views import BoardAuthPermission
 
 
 class TaskList(generics.ListCreateAPIView):
@@ -36,7 +40,7 @@ class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
     Deletion is restricted to the task creator or board owner.
     """
     serializer_class = TaskSerializer
-    permission_classes = [IsAuthenticated,
+    permission_classes = [BoardAuthPermission,
                           IsMemberOrOwner, IsCreatorOrBoardOwnerForDelete]
 
     def get_queryset(self):
@@ -46,6 +50,26 @@ class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
             return Task.objects.all()
 
         return Task.objects.filter(board__memberships__user=user).distinct()
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Handle DELETE request with custom error handling.
+
+        Returns status 204 on success, 404 for not found, and 500 for
+        server errors, all with empty bodies. Permission errors (403)
+        are handled by DRF and include a message.
+        """
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        except Http404:
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied:
+            # Re-raise to let DRF's exception handler create the 403 response
+            raise
+        except Exception:
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class TaskAssigned(generics.ListAPIView):
