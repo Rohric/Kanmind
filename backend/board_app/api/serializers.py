@@ -8,6 +8,11 @@ User = get_user_model()
 
 
 class BoardDetailSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the detailed view of a Board.
+
+    Includes nested serialization for associated members and tasks.
+    """
     owner_id = serializers.IntegerField(source='owner.id', read_only=True)
     members = serializers.SerializerMethodField()
     tasks = TaskSerializer(source='task_set', many=True, read_only=True)
@@ -17,6 +22,7 @@ class BoardDetailSerializer(serializers.ModelSerializer):
         fields = ['id', 'title', 'owner_id', 'members', 'tasks']
 
     def get_members(self, obj):
+        """Return a serialized list of all board members."""
         users = [membership.user for membership in obj.memberships.all()]
         serializer = SimpleUserSerializer(
             users, many=True, context=self.context)
@@ -24,6 +30,13 @@ class BoardDetailSerializer(serializers.ModelSerializer):
 
 
 class BoardSerializer(serializers.ModelSerializer):
+    """
+    Serializer for listing, creating, and updating Boards.
+
+    - Handles creation and updates with a list of member IDs.
+    - Provides aggregated data like member and task counts for list views.
+    - Customizes representation for list vs. update views.
+    """
     members = serializers.ListField(
         child=serializers.IntegerField(),
         write_only=True
@@ -46,24 +59,30 @@ class BoardSerializer(serializers.ModelSerializer):
                   'owner_data', 'members_data']
 
     def get_member_count(self, obj):
+        """Return the total number of members in the board."""
         return obj.memberships.count()
 
     def get_ticket_count(self, obj):
+        """Return the total number of tasks in the board."""
         return obj.tasks.count()
 
     def get_tasks_to_do_count(self, obj):
+        """Return the number of tasks with status 'to-do'."""
         return obj.tasks.filter(status='to-do').count()
 
     def get_tasks_high_prio_count(self, obj):
+        """Return the number of tasks with priority 'high'."""
         return obj.tasks.filter(priority='high').count()
 
     def get_members_data(self, obj):
+        """Return a serialized list of all board members."""
         users = [membership.user for membership in obj.memberships.all()]
         serializer = SimpleUserSerializer(
             users, many=True, context=self.context)
         return serializer.data
 
     def validate_members(self, value):
+        """Ensure all provided member IDs correspond to existing users."""
         existing_users = User.objects.filter(
             id__in=value).values_list('id', flat=True)
         if len(existing_users) != len(set(value)):
@@ -72,6 +91,12 @@ class BoardSerializer(serializers.ModelSerializer):
         return value
 
     def to_representation(self, instance):
+        """
+        Customize the serialized output.
+
+        - For PUT/PATCH, return a simple representation with member details.
+        - For GET (list), return the full representation with counts.
+        """
         data = super().to_representation(instance)
         request = self.context.get('request')
 
@@ -88,6 +113,12 @@ class BoardSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        """
+        Create a new Board and its memberships.
+
+        The requesting user becomes the owner. Other users from the 'members'
+        list are added as members.
+        """
         members = validated_data.pop('members')
         user = self.context['request'].user
 
@@ -97,6 +128,12 @@ class BoardSerializer(serializers.ModelSerializer):
         return board
 
     def update(self, instance, validated_data):
+        """
+        Update a Board's title and its members.
+
+        Compares the new list of member IDs with the existing ones to add
+        or remove memberships as needed. The owner cannot be removed.
+        """
         instance.title = validated_data.get('title', instance.title)
         instance.save()
 
@@ -122,13 +159,16 @@ class BoardSerializer(serializers.ModelSerializer):
         return instance
 
     def create_board(self, data, user):
+        """Helper method to create a board instance."""
         return Board.objects.create(owner=user, **data)
 
     def handle_members(self, board, owner_id, members):
+        """Helper method to orchestrate adding owner and member roles."""
         self.add_owner(board, owner_id)
         self.add_members(board, owner_id, members)
 
     def add_owner(self, board, owner_id):
+        """Create the 'owner' membership for the board."""
         BoardMembership.objects.create(
             user_id=owner_id,
             board=board,
@@ -136,6 +176,7 @@ class BoardSerializer(serializers.ModelSerializer):
         )
 
     def add_members(self, board, owner_id, members):
+        """Create 'member' memberships for a list of user IDs."""
         for user_id in set(members):
             if user_id != owner_id:
                 BoardMembership.objects.create(

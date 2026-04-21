@@ -12,36 +12,44 @@ from django.contrib.auth.models import User
 
 
 class UserProfileList(generics.ListCreateAPIView):
+    """API endpoint to list or create user profiles."""
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
     def get(self, request):
+        """Handle GET request to list user profiles."""
         return super().get(request)
 
 
 class UserListView(APIView):
+    """API endpoint to list all users with basic information."""
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        """Return a list of all users (id, email, username)."""
         users = User.objects.all().values('id', 'email', 'username')
         return Response(list(users))
 
 
 class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """API endpoint to retrieve, update, or delete a single user."""
     permission_classes = [IsAuthenticated]
     queryset = User.objects.all()
     serializer_class = SimpleUserSerializer
 
 
 class UserProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+    """API endpoint to retrieve, update, or delete a single user profile."""
     queryset = UserProfile.objects.all()
     serializer_class = UserProfileSerializer
 
 
 class RegistrationView(APIView):
+    """API endpoint for user registration."""
     permission_classes = [AllowAny]
 
     def post(self, request):
+        """Handle user registration and return an auth token on success."""
         serializer = RegistrationSerializer(data=request.data)
 
         if serializer.is_valid():
@@ -59,9 +67,11 @@ class RegistrationView(APIView):
 
 
 class LoginView(APIView):
+    """API endpoint for user login."""
     permission_classes = []
 
     def post(self, request):
+        """Handle user authentication and return an auth token on success."""
         email = request.data.get('email')
         password = request.data.get('password')
 
@@ -90,9 +100,11 @@ class LoginView(APIView):
 
 
 class LogoutView(APIView):
+    """API endpoint for user logout."""
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
+        """Delete the user's authentication token from the server."""
         token = getattr(request.user, 'auth_token', None)
 
         if token:
@@ -102,16 +114,34 @@ class LogoutView(APIView):
 
 
 class CheckEmailPermission(BasePermission):
+    """
+    Custom permission class to enforce authentication.
+
+    Returns a specific German error message for 401 Unauthorized responses.
+    """
     message = "Nicht autorisiert. Der Benutzer muss eingeloggt sein."
 
     def has_permission(self, request, view):
+        """Return `True` if the user is authenticated, `False` otherwise."""
         return bool(request.user and request.user.is_authenticated)
 
 
 class EmailCheckView(APIView):
+    """API endpoint to check if an email address is already registered."""
     permission_classes = [CheckEmailPermission]
 
     def get(self, request):
+        """
+        Check for the existence of a user by email.
+
+        The email is passed as a query parameter.
+
+        Returns:
+            - 200 with user data if found.
+            - 400 if the email parameter is missing.
+            - 404 if the email is not found.
+            - 500 for any other server error.
+        """
         email = request.query_params.get('email', None)
 
         if not email:

@@ -9,6 +9,13 @@ User = get_user_model()
 
 
 class TaskSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Task model.
+
+    Handles read-only representation of assignee/reviewer and write-only
+    fields for setting them by ID. Includes validation to ensure users
+    are members of the board.
+    """
     assignee = SimpleUserSerializer(read_only=True)
     reviewer = SimpleUserSerializer(read_only=True)
 
@@ -30,9 +37,11 @@ class TaskSerializer(serializers.ModelSerializer):
                   'due_date', 'comments_count']
 
     def get_comments_count(self, obj):
+        """Return the number of comments associated with the task."""
         return obj.comment_set.count()
 
     def validate(self, data):
+        """Ensure the user and any assigned users are members of the board."""
         board = data.get('board')
         if not board and self.instance:
             board = self.instance.board
@@ -58,12 +67,19 @@ class TaskSerializer(serializers.ModelSerializer):
         return data
 
     def create(self, validated_data):
+        """Set the creator of the task to the current request user."""
         request = self.context.get('request')
         validated_data['creator'] = request.user
         return super().create(validated_data)
 
 
 class CommentSerializer(serializers.ModelSerializer):
+    """
+    Serializer for the Comment model.
+
+    Sets the author and task automatically based on the request context.
+    Includes permission checks for creating and updating comments.
+    """
     author = serializers.CharField(source='user.first_name', read_only=True)
 
     class Meta:
@@ -71,6 +87,12 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ['id', 'created_at', 'author', 'content']
 
     def create(self, validated_data):
+        """
+        Create a new comment.
+
+        The author is set to the request user. The task is derived from the URL.
+        Validates that the user is a member of the task's board.
+        """
         request = self.context.get('request')
         view = self.context.get('view')
 
@@ -87,6 +109,7 @@ class CommentSerializer(serializers.ModelSerializer):
         return super().create(validated_data)
 
     def update(self, instance, validated_data):
+        """Ensure that users can only update their own comments."""
         request = self.context.get('request')
 
         if instance.user != request.user and not request.user.is_superuser:

@@ -3,10 +3,18 @@ from board_app.models import Board
 
 
 class IsMemberOrOwner(BasePermission):
-    # Standard-Fehlermeldung für 403-Fehler
+    """
+    Custom permission to only allow members or owners of a board to access it.
+
+    Handles different object types (Board, Task, Comment) by traversing
+    relationships to find the associated board.
+
+    Provides specific error messages for different permission failures.
+    """
     message = "Verboten. Der Benutzer muss entweder Mitglied des Boards oder der Eigentümer des Boards sein."
 
     def has_object_permission(self, request, view, obj):
+        """Check if the user is a member or owner of the object's board."""
         if request.user and request.user.is_superuser:
             return True
 
@@ -14,19 +22,17 @@ class IsMemberOrOwner(BasePermission):
         board = None
         if is_board_obj:
             board = obj
-        elif hasattr(obj, 'board'):  # Handles Task objects
+        elif hasattr(obj, 'board'):
             board = obj.board
-        elif hasattr(obj, 'task') and hasattr(obj.task, 'board'):  # Handles Comment objects
+        elif hasattr(obj, 'task') and hasattr(obj.task, 'board'):
             board = obj.task.board
 
         if not board:
-            return False  # Fallback, if no board can be determined
+            return False
 
         if is_board_obj and request.method == "DELETE":
-            # Spezifische Fehlermeldung, wenn der User nicht der Owner ist beim Löschen
             self.message = "Verboten. Der Benutzer muss der Eigentümer des Boards sein, um es zu löschen."
             return board.memberships.filter(user=request.user, role='owner').exists()
 
-        # Setzt die Nachricht für alle anderen Fälle (GET, PATCH) auf den Standard zurück
         self.message = "Verboten. Der Benutzer muss entweder Mitglied des Boards oder der Eigentümer des Boards sein."
         return board.memberships.filter(user=request.user).exists()

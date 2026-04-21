@@ -1,19 +1,19 @@
 # Kanmind Backend
 
-Dies ist das Django REST Framework Backend für ein **Kanmind**. Es verwaltet die Datenbank und stellt die API für die Authentifizierung, Boards und Tasks (Aufgaben) bereit.
+This is the Django REST Framework backend for **Kanmind**. It manages the database and provides the API for authentication, boards, and tasks.
 
-## 📋 Voraussetzungen
+## 📋 Prerequisites
 
-Stelle sicher, dass Folgendes auf deinem System installiert ist:
-- [Python 3.10+](https://www.python.org/downloads/) (oder neuer)
+Make sure the following are installed on your system:
+- [Python 3.10+](https://www.python.org/downloads/) (or newer)
 - [Git](https://git-scm.com/)
 
 ## 🚀 Setup & Installation
 
-Folge diesen Schritten, um das Projekt lokal aufzusetzen und zu starten:
+Follow these steps to set up and start the project locally:
 
-### 1. Repository klonen
-Öffne dein Terminal und klone das Repository:
+### 1. Clone the repository
+Open your terminal and clone the repository:
 ```bash
 git clone https://github.com/Rohric/Kanmind
 cd Kanmind/backend
