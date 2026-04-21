@@ -7,7 +7,7 @@ from rest_framework.response import Response
 from .serializers import RegistrationSerializer
 from rest_framework import status
 from django.contrib.auth import authenticate
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny, IsAuthenticated, BasePermission
 from django.contrib.auth.models import User
 
 
@@ -99,3 +99,29 @@ class LogoutView(APIView):
             token.delete()
 
         return Response({"detail": "Logout erfolgreich. Token wurde gelöscht."}, status=status.HTTP_200_OK)
+
+
+class CheckEmailPermission(BasePermission):
+    message = "Nicht autorisiert. Der Benutzer muss eingeloggt sein."
+
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated)
+
+
+class EmailCheckView(APIView):
+    permission_classes = [CheckEmailPermission]
+
+    def get(self, request):
+        email = request.query_params.get('email', None)
+
+        if not email:
+            return Response(status=400)
+
+        try:
+            user = User.objects.get(email=email)
+            serializer = SimpleUserSerializer(user)
+            return Response(serializer.data, status=200)
+        except User.DoesNotExist:
+            return Response(status=404)
+        except Exception:
+            return Response(status=500)
