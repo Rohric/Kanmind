@@ -1,3 +1,7 @@
+Hier ist deine README vollständig und sauber ins Englische übersetzt:
+
+---
+
 # Kanmind Backend
 
 This is the Django REST Framework backend for **Kanmind**. It manages the database and provides the API for authentication, boards, and tasks.
@@ -5,78 +9,95 @@ This is the Django REST Framework backend for **Kanmind**. It manages the databa
 ## 📋 Prerequisites
 
 Make sure the following are installed on your system:
-- [Python 3.10+](https://www.python.org/downloads/) (or newer)
-- [Git](https://git-scm.com/)
+
+* Python 3.10+ (or newer)
+* Git
 
 ## 🚀 Setup & Installation
 
 Follow these steps to set up and start the project locally:
 
 ### 1. Clone the repository
+
 Open your terminal and clone the repository:
+
 ```bash
 git clone https://github.com/Rohric/Kanmind
 cd Kanmind/backend
 ```
 
-### 2. Virtuelle Umgebung erstellen & aktivieren
-Es wird dringend empfohlen, eine virtuelle Umgebung (`venv`) zu verwenden, um die Abhängigkeiten des Projekts zu isolieren.
+### 2. Create & activate a virtual environment
+
+It is highly recommended to use a virtual environment (`venv`) to isolate project dependencies.
 
 **Windows:**
-```cmd
+
+```bash
 python -m venv env
 env\Scripts\activate
 ```
 
 **macOS / Linux:**
+
 ```bash
-python3 -m env env
-source venv/bin/activate
+python3 -m venv env
+source env/bin/activate
 ```
 
-### 3. Abhängigkeiten installieren
-Sobald die virtuelle Umgebung aktiviert ist (meist sichtbar an einem `(venv)` im Terminal), installiere die benötigten Pakete:
+### 3. Install dependencies
+
+Once the virtual environment is activated (usually indicated by `(env)` in the terminal), install the required packages:
+
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Datenbank-Migrationen durchführen
-Das Projekt verwendet standardmäßig SQLite3. Erstelle die Datenbank und die benötigten Tabellen mit folgendem Befehl:
+### 4. Apply database migrations
+
+The project uses SQLite3 by default. Create the database and required tables with:
+
 ```bash
 python manage.py migrate
 ```
 
-### 5. Administrator-Konto erstellen (Optional)
-Um Zugriff auf das integrierte Django Admin-Panel zu erhalten, erstelle einen Superuser:
+### 5. Create an admin account (optional)
+
+To access the built-in Django admin panel, create a superuser:
+
 ```bash
 python manage.py createsuperuser
 ```
-Folge den Anweisungen im Terminal (Benutzername, E-Mail, Passwort).
 
-### 6. Entwicklungsserver starten
-Starte den lokalen Server:
+Follow the instructions in the terminal (username, email, password).
+
+### 6. Start the development server
+
+Start the local server:
+
 ```bash
 python manage.py runserver
 ```
-Das Backend läuft nun! Du kannst das Admin-Panel im Browser unter `http://127.0.0.1:8000/admin/` aufrufen.
 
-## 📡 API Endpunkte
+The backend is now running! You can access the admin panel at:
+`http://127.0.0.1:8000/admin/`
 
-Folgende Haupt-Routen (Endpunkte) stellt diese REST-API zur Verfügung:
+## 📡 API Endpoints
 
-- **Authentifizierung / User:** `/api/` (Token-based Auth)
-- **Boards:** `/api/boards/`
-- **Aufgaben (Tasks):** `/api/tasks/`
-- **API Auth UI:** `/api-auth/`
+The REST API provides the following main routes (endpoints):
 
+* **Authentication / User:** `/api/` (token-based authentication)
+* **Boards:** `/api/boards/`
+* **Tasks:** `/api/tasks/`
+* **API Auth UI:** `/api-auth/`
 
-## 📖 Detaillierte API Endpunkte & Payloads
+## 📖 Detailed API Endpoints & Payloads
 
-Hier ist eine genaue Auflistung der Pfade und wie die JSON-Bodys für Anfragen (z.B. `POST`, `PUT`) aussehen müssen. Alle Endpunkte (außer Registrierung und Login) erfordern einen Authentifizierungs-Token im Header (`Authorization: Token <token>`).
+Here is a detailed list of routes and the required JSON bodies for requests (e.g., `POST`, `PUT`). All endpoints (except registration and login) require an authentication token in the header (`Authorization: Token <token>`).
 
-### Authentifizierung & Benutzer (`/api/auth/`)
+### Authentication & Users (`/api/auth/`)
 
-- **`POST registration/`** (Registrierung)
+* **`POST registration/`** (Register)
+
   ```json
   {
     "username": "maxmustermann",
@@ -85,52 +106,68 @@ Hier ist eine genaue Auflistung der Pfade und wie die JSON-Bodys für Anfragen (
     "repeated_password": "SuperSecretPassword123"
   }
   ```
-- **`POST login/`** (Login)
+
+* **`POST login/`** (Login)
+
   ```json
   {
     "username": "maxmustermann",
     "password": "SuperSecretPassword123"
   }
   ```
-  *Gibt den Auth-Token zurück.*
-- **`POST logout/`** (Abmelden)
-  Erfordert nur den Token im Header, kein Body nötig. Token wird auf dem Server gelöscht.
-- **`GET profiles/` & `GET profiles/<int:pk>/`**
-  Liest alle bzw. ein spezifisches Benutzerprofil aus.
-- **`GET users/` & `GET users/<int:pk>/`**
-  Liest allgemeine Account-Daten (wie ID, Username) der registrierten Benutzer aus.
+
+  *Returns the authentication token.*
+
+* **`POST logout/`** (Logout)
+  Requires only the token in the header, no body needed. The token is deleted on the server.
+
+* **`GET profiles/` & `GET profiles/<int:pk>/`**
+  Retrieves all or a specific user profile.
+
+* **`GET users/` & `GET users/<int:pk>/`**
+  Retrieves general account data (e.g., ID, username) of registered users.
+
+---
 
 ### Boards (`/api/boards/`)
 
-- **`GET /` & `POST /`** (Boards auflisten / erstellen)
-  Um ein neues Board zu erstellen, übergib den Titel und optional eine Liste von User-IDs, die Mitglieder sein sollen:
+* **`GET /` & `POST /`** (List / create boards)
+  To create a new board, provide a title and optionally a list of user IDs as members:
+
   ```json
   {
-    "title": "Mein Projekt-Board",
+    "title": "My Project Board",
     "members":
   }
   ```
-- **`GET /<int:pk>/`** (Board Details)
-  Gibt Details zum Board, den Mitgliedern und allen darin enthaltenen Tasks zurück.
-- **`PUT /<int:pk>/` & `PATCH /<int:pk>/`** (Board bearbeiten)
+
+* **`GET /<int:pk>/`** (Board details)
+  Returns details about the board, its members, and all included tasks.
+
+* **`PUT /<int:pk>/` & `PATCH /<int:pk>/`** (Update board)
+
   ```json
   {
-    "title": "Neuer Projektname",
+    "title": "New Project Name",
     "members":
   }
   ```
-- **`DELETE /<int:pk>/`** (Board löschen)
-  Löscht das Board (Nur für Board-Owner erlaubt).
 
-### Tasks & Kommentare (`/api/tasks/`)
+* **`DELETE /<int:pk>/`** (Delete board)
+  Deletes the board (only allowed for the board owner).
 
-- **`GET /` & `POST /`** (Tasks auflisten / erstellen)
-  Für das Erstellen eines Tasks:
+---
+
+### Tasks & Comments (`/api/tasks/`)
+
+* **`GET /` & `POST /`** (List / create tasks)
+  To create a task:
+
   ```json
   {
     "board": 1,
-    "title": "Datenbank aufsetzen",
-    "description": "PostgreSQL Datenbank einrichten",
+    "title": "Set up database",
+    "description": "Configure PostgreSQL database",
     "status": "to-do",
     "priority": "high",
     "assignee_id": 2,
@@ -138,40 +175,48 @@ Hier ist eine genaue Auflistung der Pfade und wie die JSON-Bodys für Anfragen (
     "due_date": "2026-05-01"
   }
   ```
-- **`GET /<int:pk>/` , `PUT`, `PATCH`, `DELETE`** (Task Details & Bearbeitung)
-  Zum Ändern eines Tasks (z. B. Status-Update).
 
-- **`GET /<int:task_id>/comments/` & `POST`** (Kommentare eines Tasks)
+* **`GET /<int:pk>/`, `PUT`, `PATCH`, `DELETE`**
+  Retrieve and modify a specific task (e.g., update status).
+
+* **`GET /<int:task_id>/comments/` & `POST`** (Task comments)
+
   ```json
   {
-    "content": "Ich habe die Datenbank heute morgen aufgesetzt!"
+    "content": "I set up the database this morning!"
   }
   ```
-- **`GET /<int:task_id>/comments/<int:pk>/` , `PUT`, `PATCH`, `DELETE`**
-  Einen spezifischen Kommentar bearbeiten oder löschen.
 
-- **`GET /assigned-to-me/`**
-  Listet alle Tasks auf, bei denen der eingeloggte Benutzer als `assignee` eingetragen ist.
-- **`GET /reviewing/`**
-  Listet alle Tasks auf, bei denen der eingeloggte Benutzer als `reviewer` eingetragen ist.
+* **`GET /<int:task_id>/comments/<int:pk>/`, `PUT`, `PATCH`, `DELETE`**
+  Edit or delete a specific comment.
+
+* **`GET /assigned-to-me/`**
+  Lists all tasks where the logged-in user is the `assignee`.
+
+* **`GET /reviewing/`**
+  Lists all tasks where the logged-in user is the `reviewer`.
 
 ---
 
-## 🛡️ Detaillierte Rechteverteilung (Permissions)
+## 🛡️ Detailed Permission System
 
-Das Backend stellt durch stricte Überprüfungen (in den Views und Serializern) sicher, dass Benutzer nur auf Daten zugreifen können, die für sie bestimmt sind:
+The backend enforces strict permission checks (in views and serializers) to ensure users only access data intended for them:
 
-1. **Boards:**
-   - Jeder eingeloggte User darf ein Board erstellen.
-   - Der Ersteller wird automatisch **Mitglied** und erhält die Rolle **Owner**.
-   - Der Owner kann jederzeit andere User über ihre IDs als Mitglieder hinzufügen oder entfernen.
+### 1. Boards
 
-2. **Tasks:**
-   - Nur **Mitglieder eines Boards** können darin neue Tasks erstellen oder bestehende bearbeiten.
-   - Beim Zuweisen eines `assignee` oder `reviewer` stellt die API sicher, dass auch diese User zwingend Mitglieder des betreffenden Boards sein müssen.
-   - **Löschen:** Einen Task können ausschließlich der *Ersteller des Tasks* oder der *Owner des Boards* löschen.
+* Any logged-in user can create a board.
+* The creator is automatically added as a **member** and assigned the role **owner**.
+* The owner can add or remove other users as members using their IDs.
 
-3. **Kommentare:**
-   - Nur **Mitglieder eines Boards** können Kommentare zu den Tasks innerhalb des Boards verfassen.
-   - **Bearbeiten:** Du kannst ausschließlich deine *eigenen* Kommentare bearbeiten.
-   - **Löschen:** Einen Kommentar können ausschließlich der *Ersteller des Kommentars* oder der *Owner des Boards* löschen.
+### 2. Tasks
+
+* Only **board members** can create or edit tasks within a board.
+* When assigning an `assignee` or `reviewer`, the API ensures that these users are also members of the respective board.
+* **Delete:** Only the *task creator* or the *board owner* can delete a task.
+
+### 3. Comments
+
+* Only **board members** can write comments on tasks within the board.
+* **Edit:** You can only edit your *own* comments.
+* **Delete:** Only the *comment creator* or the *board owner* can delete a comment.
+

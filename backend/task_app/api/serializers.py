@@ -8,6 +8,24 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 
+class NestedTaskSerializer(serializers.ModelSerializer):
+    """
+    A simplified serializer for displaying tasks within a board detail view.
+    """
+    assignee = SimpleUserSerializer(read_only=True)
+    reviewer = SimpleUserSerializer(read_only=True)
+    comments_count = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Task
+        fields = ['id', 'title', 'description', 'status', 'priority',
+                  'assignee', 'reviewer', 'due_date', 'comments_count']
+
+    def get_comments_count(self, obj):
+        """Return the number of comments associated with the task."""
+        return obj.comment_set.count()
+
+
 class TaskSerializer(serializers.ModelSerializer):
     """
     Serializer for the Task model.

@@ -7,6 +7,7 @@ from rest_framework import permissions, status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from django.http import Http404
+from rest_framework.exceptions import PermissionDenied
 
 
 class BoardAuthPermission(BasePermission):
@@ -57,18 +58,13 @@ class BoardsList(generics.ListCreateAPIView):
         """
         Handle POST request to create a new board with custom error handling.
 
-        Returns status 400 for validation errors and 500 for server errors,
-        both with empty bodies.
+        Returns status 500 for server errors. Validation errors (400) are
+        handled by DRF and include a message.
         """
         try:
-            serializer = self.get_serializer(data=request.data)
-            if not serializer.is_valid():
-                return Response(status=400)
-            self.perform_create(serializer)
-            headers = self.get_success_headers(serializer.data)
-            return Response(serializer.data, status=201, headers=headers)
+            return super().post(request, *args, **kwargs)
         except Exception:
-            return Response(status=500)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
 class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -92,50 +88,46 @@ class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
         """
         Handle GET request with custom error handling.
 
-        Returns status 404 for not found and 500 for server errors,
-        both with empty bodies.
+        Returns status 404 for not found and 500 for server errors.
+        Permission errors (403) are handled by DRF.
         """
         try:
-            instance = self.get_object()
-            serializer = self.get_serializer(instance)
-            return Response(serializer.data, status=200)
+            return super().retrieve(request, *args, **kwargs)
         except Http404:
-            return Response(status=404)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied:
+            raise
         except Exception:
-            return Response(status=500)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def partial_update(self, request, *args, **kwargs):
         """
         Handle PATCH request with custom error handling.
 
-        Returns status 400 for validation errors, 404 for not found,
-        and 500 for server errors, all with empty bodies.
+        Returns status 404 for not found and 500 for server errors.
+        Validation (400) and permission (403) errors are handled by DRF.
         """
         try:
-            instance = self.get_object()
-            serializer = self.get_serializer(
-                instance, data=request.data, partial=True)
-            if not serializer.is_valid():
-                return Response(status=400)
-            self.perform_update(serializer)
-            return Response(serializer.data, status=200)
+            return super().partial_update(request, *args, **kwargs)
         except Http404:
-            return Response(status=404)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied:
+            raise
         except Exception:
-            return Response(status=500)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def destroy(self, request, *args, **kwargs):
         """
         Handle DELETE request with custom error handling.
 
         Returns status 204 on success, 404 for not found, and 500 for
-        server errors, all with empty bodies.
+        server errors. Permission errors (403) are handled by DRF.
         """
         try:
-            instance = self.get_object()
-            self.perform_destroy(instance)
-            return Response(status=204)
+            return super().destroy(request, *args, **kwargs)
         except Http404:
-            return Response(status=404)
+            return Response(status=status.HTTP_404_NOT_FOUND)
+        except PermissionDenied:
+            raise
         except Exception:
-            return Response(status=500)
+            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)

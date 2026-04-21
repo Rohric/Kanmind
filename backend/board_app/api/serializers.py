@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from board_app.models import Board, BoardMembership
-from task_app.api.serializers import TaskSerializer
+from task_app.api.serializers import NestedTaskSerializer
 from user_auth_app.api.serializers import SimpleUserSerializer
 from django.contrib.auth import get_user_model
 
@@ -15,7 +15,7 @@ class BoardDetailSerializer(serializers.ModelSerializer):
     """
     owner_id = serializers.IntegerField(source='owner.id', read_only=True)
     members = serializers.SerializerMethodField()
-    tasks = TaskSerializer(source='task_set', many=True, read_only=True)
+    tasks = NestedTaskSerializer(many=True, read_only=True)
 
     class Meta:
         model = Board
@@ -23,7 +23,8 @@ class BoardDetailSerializer(serializers.ModelSerializer):
 
     def get_members(self, obj):
         """Return a serialized list of all board members."""
-        users = [membership.user for membership in obj.memberships.all()]
+        memberships = obj.memberships.select_related('user').all()
+        users = [membership.user for membership in memberships]
         serializer = SimpleUserSerializer(
             users, many=True, context=self.context)
         return serializer.data
@@ -76,7 +77,8 @@ class BoardSerializer(serializers.ModelSerializer):
 
     def get_members_data(self, obj):
         """Return a serialized list of all board members."""
-        users = [membership.user for membership in obj.memberships.all()]
+        memberships = obj.memberships.select_related('user').all()
+        users = [membership.user for membership in memberships]
         serializer = SimpleUserSerializer(
             users, many=True, context=self.context)
         return serializer.data
@@ -119,11 +121,21 @@ class BoardSerializer(serializers.ModelSerializer):
         The requesting user becomes the owner. Other users from the 'members'
         list are added as members.
         """
-        members = validated_data.pop('members')
+        member_ids = set(validated_data.pop('members'))
         user = self.context['request'].user
 
-        board = self.create_board(validated_data, user)
-        self.handle_members(board, user.id, members)
+        board = Board.objects.create(owner=user, **validated_data)
+
+        memberships_to_create = [
+            BoardMembership(user=user, board=board, role='owner')
+        ]
+        for user_id in member_ids:
+            if user_id != user.id:
+                memberships_to_create.append(
+                    BoardMembership(user_id=user_id,
+                                    board=board, role='member')
+                )
+        BoardMembership.objects.bulk_create(memberships_to_create)
 
         return board
 
@@ -138,7 +150,7 @@ class BoardSerializer(serializers.ModelSerializer):
         instance.save()
 
         if 'members' in validated_data:
-            new_member_ids = set(validated_data.pop('members'))
+            new_member_ids = set(validated_data.get('members'))
             owner_id = instance.owner.id
 
             if owner_id in new_member_ids:
@@ -152,34 +164,15 @@ class BoardSerializer(serializers.ModelSerializer):
             members_to_remove = current_member_ids - new_member_ids
             members_to_add = new_member_ids - current_member_ids
 
-            BoardMembership.objects.filter(
-                board=instance, user_id__in=members_to_remove).delete()
-            self.add_members(instance, owner_id, members_to_add)
+            if members_to_remove:
+                BoardMembership.objects.filter(
+                    board=instance, user_id__in=members_to_remove).delete()
+            if members_to_add:
+                new_memberships = [
+                    BoardMembership(user_id=user_id,
+                                    board=instance, role='member')
+                    for user_id in members_to_add
+                ]
+                BoardMembership.objects.bulk_create(new_memberships)
 
         return instance
-
-    def create_board(self, data, user):
-        """Helper method to create a board instance."""
-        return Board.objects.create(owner=user, **data)
-
-    def handle_members(self, board, owner_id, members):
-        """Helper method to orchestrate adding owner and member roles."""
-        self.add_owner(board, owner_id)
-        self.add_members(board, owner_id, members)
-
-    def add_owner(self, board, owner_id):
-        """Create the 'owner' membership for the board."""
-        BoardMembership.objects.create(
-            user_id=owner_id,
-            board=board,
-            role='owner'
-        )
-
-    def add_members(self, board, owner_id, members):
-        """Create 'member' memberships for a list of user IDs."""
-        for user_id in set(members):
-            if user_id != owner_id:
-                BoardMembership.objects.create(
-                    user_id=user_id,
-                    board=board,
-                    role='member')
