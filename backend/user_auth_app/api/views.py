@@ -113,22 +113,9 @@ class LogoutView(APIView):
         return Response({"detail": "Logout erfolgreich. Token wurde gelöscht."}, status=status.HTTP_200_OK)
 
 
-class CheckEmailPermission(BasePermission):
-    """
-    Custom permission class to enforce authentication.
-
-    Returns a specific German error message for 401 Unauthorized responses.
-    """
-    message = "Nicht autorisiert. Der Benutzer muss eingeloggt sein."
-
-    def has_permission(self, request, view):
-        """Return `True` if the user is authenticated, `False` otherwise."""
-        return bool(request.user and request.user.is_authenticated)
-
-
 class EmailCheckView(APIView):
     """API endpoint to check if an email address is already registered."""
-    permission_classes = [CheckEmailPermission]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """
