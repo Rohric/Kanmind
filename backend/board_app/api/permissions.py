@@ -34,5 +34,5 @@ class IsMemberOrOwner(BasePermission):
             self.message = "Verboten. Der Benutzer muss der Eigentümer des Boards sein, um es zu löschen."
             return board.memberships.filter(user=request.user, role='owner').exists()
 
-        self.message = "Verboten. Der Benutzer muss entweder Mitglied des Boards oder der Eigentümer des Boards sein."
+        self.message = "Der Benutzer muss Mitglied eines der Boards oder der Eigentümer eines Boards sein, um es anzuzeigen."
         return board.memberships.filter(user=request.user).exists()

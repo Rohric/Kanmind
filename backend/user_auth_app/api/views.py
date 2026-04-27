@@ -86,7 +86,7 @@ class LoginView(APIView):
         if not user:
             return Response(
                 {"error": "Invalid credentials"},
-                status=status.HTTP_400_BAD_REQUEST
+                status=400
             )
 
         token, _ = Token.objects.get_or_create(user=user)
@@ -96,7 +96,7 @@ class LoginView(APIView):
             "fullname": user.first_name,
             "email": user.email,
             "user_id": user.id
-        }, status=status.HTTP_200_OK)
+        }, status=200)
 
 
 class LogoutView(APIView):
