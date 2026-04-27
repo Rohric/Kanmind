@@ -1,13 +1,13 @@
-from rest_framework import generics
 from board_app.models import Board
-from .serializers import BoardSerializer, BoardDetailSerializer
-from rest_framework.permissions import IsAuthenticated, BasePermission
-from . permissions import IsMemberOrOwner
-from rest_framework import permissions, status
-from rest_framework.views import APIView
-from rest_framework.response import Response
 from django.http import Http404
+from rest_framework import generics, permissions, status
 from rest_framework.exceptions import PermissionDenied
+from rest_framework.permissions import BasePermission
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from .permissions import IsMemberOrOwner
+from .serializers import BoardDetailSerializer, BoardSerializer
 
 
 class BoardAuthPermission(BasePermission):
@@ -16,6 +16,7 @@ class BoardAuthPermission(BasePermission):
 
     Returns a specific German error message for 401 Unauthorized responses.
     """
+
     message = "Nicht autorisiert. Der Benutzer muss eingeloggt sein."
 
     def has_permission(self, request, view):
@@ -25,11 +26,12 @@ class BoardAuthPermission(BasePermission):
 
 class TestApiView(APIView):
     """A simple view to confirm the API is running."""
+
     permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         """Return a static 'running...' message."""
-        return Response({'message': 'running...'}, status=status.HTTP_200_OK)
+        return Response({"message": "running..."}, status=status.HTTP_200_OK)
 
 
 class BoardsList(generics.ListCreateAPIView):
@@ -39,6 +41,7 @@ class BoardsList(generics.ListCreateAPIView):
     - GET: Returns a list of boards the user is a member of.
     - POST: Creates a new board.
     """
+
     serializer_class = BoardSerializer
     permission_classes = [BoardAuthPermission]
 
@@ -75,12 +78,13 @@ class BoardDetail(generics.RetrieveUpdateDestroyAPIView):
     - PATCH: Update a board's title and/or members.
     - DELETE: Delete a board.
     """
+
     queryset = Board.objects.all()
     permission_classes = [BoardAuthPermission, IsMemberOrOwner]
 
     def get_serializer_class(self):
         """Return `BoardDetailSerializer` for GET, `BoardSerializer` otherwise."""
-        if self.request.method == 'GET':
+        if self.request.method == "GET":
             return BoardDetailSerializer
         return BoardSerializer
 

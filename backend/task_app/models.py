@@ -1,45 +1,42 @@
-from django.db import models
 # Create your models here.
-
 from django.contrib.auth import get_user_model
+from django.db import models
 
 User = get_user_model()
 
 
 class Task(models.Model):
     STATUS_CHOICES = [
-        ('to-do', 'To Do'),
-        ('in-progress', 'In Progress'),
-        ('review', 'Review'),
-        ('done', 'Done'),
+        ("to-do", "To Do"),
+        ("in-progress", "In Progress"),
+        ("review", "Review"),
+        ("done", "Done"),
     ]
 
     PRIORITY_CHOICES = [
-        ('low', 'Low'),
-        ('medium', 'Medium'),
-        ('high', 'High'),
+        ("low", "Low"),
+        ("medium", "Medium"),
+        ("high", "High"),
     ]
 
     board = models.ForeignKey(
-        'board_app.Board',
-        on_delete=models.CASCADE,
-        related_name='tasks'
+        "board_app.Board", on_delete=models.CASCADE, related_name="tasks"
     )
 
     title = models.CharField(max_length=255)
     description = models.TextField()
 
-    status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default='to-do')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="to-do")
     priority = models.CharField(
-        max_length=10, choices=PRIORITY_CHOICES, default='medium')
+        max_length=10, choices=PRIORITY_CHOICES, default="medium"
+    )
 
     assignee = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='assigned_tasks'
+        related_name="assigned_tasks",
     )
 
     reviewer = models.ForeignKey(
@@ -47,17 +44,20 @@ class Task(models.Model):
         on_delete=models.SET_NULL,
         null=True,
         blank=True,
-        related_name='review_tasks'
+        related_name="review_tasks",
     )
 
-    due_date = models.DateField(null=True, blank=True,)
+    due_date = models.DateField(
+        null=True,
+        blank=True,
+    )
 
     creator = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         null=True,
         blank=True,
-        related_name='creator_tasks'
+        related_name="creator_tasks",
     )
 
     def __str__(self):
