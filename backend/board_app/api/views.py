@@ -1,10 +1,9 @@
 from board_app.models import Board
 from django.http import Http404
-from rest_framework import generics, permissions, status
+from rest_framework import generics, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
-from rest_framework.views import APIView
 
 from .permissions import IsMemberOrOwner
 from .serializers import BoardDetailSerializer, BoardSerializer
@@ -22,16 +21,6 @@ class BoardAuthPermission(BasePermission):
     def has_permission(self, request, view):
         """Return `True` if the user is authenticated, `False` otherwise."""
         return bool(request.user and request.user.is_authenticated)
-
-
-class TestApiView(APIView):
-    """A simple view to confirm the API is running."""
-
-    permission_classes = [permissions.AllowAny]
-
-    def get(self, request):
-        """Return a static 'running...' message."""
-        return Response({"message": "running..."}, status=status.HTTP_200_OK)
 
 
 class BoardsList(generics.ListCreateAPIView):
