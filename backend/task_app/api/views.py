@@ -11,6 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from .permissions import IsCreatorOrBoardOwnerForDelete
 from board_app.api.permissions import IsMemberOrOwner
 from board_app.api.views import BoardAuthPermission
+from board_app.models import Board
 
 
 class TaskList(generics.ListCreateAPIView):
@@ -24,12 +25,32 @@ class TaskList(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated, IsMemberOrOwner]
 
     def get_queryset(self):
-        """Filter tasks to only those on boards the user is a member of."""
         user = self.request.user
         if user.is_staff:
             return Task.objects.all()
-
         return Task.objects.filter(board__memberships__user=user).distinct()
+
+    def create(self, request, *args, **kwargs):
+
+        board_id = request.data.get('board')
+
+        if board_id:
+            try:
+                board = Board.objects.get(id=board_id)
+            except Board.DoesNotExist:
+                return Response(
+                    {"error": "Board nicht gefunden. Die angegebene Board-ID existiert nicht."},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+
+            is_member = board.memberships.filter(user=request.user).exists()
+            if not is_member and not request.user.is_staff:
+                return Response(
+                    {"error": "Verboten. Der Benutzer muss Mitglied des Boards sein, um eine Task zu erstellen."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+
+        return super().create(request, *args, **kwargs)
 
 
 class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
@@ -44,12 +65,7 @@ class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
                           IsMemberOrOwner, IsCreatorOrBoardOwnerForDelete]
 
     def get_queryset(self):
-        """Filter tasks to only those on boards the user is a member of."""
-        user = self.request.user
-        if user.is_staff:
-            return Task.objects.all()
-
-        return Task.objects.filter(board__memberships__user=user).distinct()
+        return Task.objects.all()
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -66,7 +82,6 @@ class TaskDetails(generics.RetrieveUpdateDestroyAPIView):
         except Http404:
             return Response(status=status.HTTP_404_NOT_FOUND)
         except PermissionDenied:
-            # Re-raise to let DRF's exception handler create the 403 response
             raise
         except Exception:
             return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR)
