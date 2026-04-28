@@ -6,7 +6,6 @@ A REST API backend for a Kanban-style project management application, built with
 
 ## Table of Contents
 
-- [Tech Stack](#tech-stack)
 - [Project Structure](#project-structure)
 - [Setup & Installation](#setup--installation)
 - [Environment Variables & Secret Key](#environment-variables--secret-key)
@@ -14,16 +13,6 @@ A REST API backend for a Kanban-style project management application, built with
 - [Authentication & User Workflow](#authentication--user-workflow)
 - [API Reference](#api-reference)
 - [Data Models](#data-models)
-
----
-
-## Tech Stack
-
-- Python 3.14
-- Django 6.0
-- Django REST Framework
-- SQLite (development)
-- Token Authentication (DRF built-in)
 
 ---
 
@@ -66,7 +55,7 @@ source env/bin/activate
 
 **3. Install dependencies**
 ```bash
-pip install django djangorestframework python-dotenv
+pip install -r requirements.txt
 ```
 
 **4. Set up your environment file** — see the section below.
@@ -355,4 +344,5 @@ After logout, the token is no longer valid and the user must log in again to get
 | `owner` | Full access: update, delete board, delete any task or comment |
 | `member` | Create and update tasks, post and edit own comments |
 
+---
 
