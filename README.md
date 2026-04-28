@@ -14,7 +14,6 @@ A REST API backend for a Kanban-style project management application, built with
 - [Authentication & User Workflow](#authentication--user-workflow)
 - [API Reference](#api-reference)
 - [Data Models](#data-models)
-- [Permissions](#permissions)
 
 ---
 
@@ -50,7 +49,7 @@ backend/
 
 **1. Clone the repository**
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/Rohric/Kanmind
 cd backend
 ```
 
