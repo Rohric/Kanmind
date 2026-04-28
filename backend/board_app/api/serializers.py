@@ -1,6 +1,7 @@
-from board_app.models import Board, BoardMembership
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
+
+from board_app.models import Board, BoardMembership
 from task_app.api.serializers import NestedTaskSerializer
 from user_auth_app.api.serializers import SimpleUserSerializer
 

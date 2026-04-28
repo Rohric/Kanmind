@@ -1,9 +1,10 @@
-from board_app.models import Board
 from django.http import Http404
 from rest_framework import generics, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import BasePermission
 from rest_framework.response import Response
+
+from board_app.models import Board
 
 from .permissions import IsMemberOrOwner
 from .serializers import BoardDetailSerializer, BoardSerializer

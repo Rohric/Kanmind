@@ -1,12 +1,13 @@
-from board_app.api.permissions import IsMemberOrOwner
-from board_app.api.views import BoardAuthPermission
-from board_app.models import Board
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from rest_framework import generics, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+
+from board_app.api.permissions import IsMemberOrOwner
+from board_app.api.views import BoardAuthPermission
+from board_app.models import Board
 from task_app.models import Comment, Task
 
 from .permissions import IsCreatorOrBoardOwnerForDelete
