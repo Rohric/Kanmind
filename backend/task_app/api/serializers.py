@@ -106,30 +106,12 @@ class TaskSerializer(serializers.ModelSerializer):
                 )
 
         assignee = data.get("assignee")
-        if (
-            assignee
-            and board
-            and not (
-                board.memberships.filter(user=assignee).exists()
-                or assignee.is_superuser
-            )
-        ):
-            raise PermissionDenied(
-                "Verboten. Der assignee muss Mitglied des Boards sein, zu dem die Task gehört."
-            )
+        if assignee and board and not (board.memberships.filter(user=assignee).exists() or assignee.is_superuser):
+            raise PermissionDenied("Verboten. Der assignee muss Mitglied des Boards sein, zu dem die Task gehört.")
 
         reviewer = data.get("reviewer")
-        if (
-            reviewer
-            and board
-            and not (
-                board.memberships.filter(user=reviewer).exists()
-                or reviewer.is_superuser
-            )
-        ):
-            raise PermissionDenied(
-                "Verboten. Der reviewer muss Mitglied des Boards sein, zu dem die Task gehört."
-            )
+        if reviewer and board and not (board.memberships.filter(user=reviewer).exists() or reviewer.is_superuser):
+            raise PermissionDenied("Verboten. Der reviewer muss Mitglied des Boards sein, zu dem die Task gehört.")
 
         return data
 
@@ -169,9 +151,7 @@ class CommentSerializer(serializers.ModelSerializer):
 
         is_member = task.board.memberships.filter(user=request.user).exists()
         if not (is_member or request.user.is_superuser):
-            raise PermissionDenied(
-                "Verboten. Du musst Mitglied des Boards sein, um hier zu kommentieren."
-            )
+            raise PermissionDenied("Verboten. Du musst Mitglied des Boards sein, um hier zu kommentieren.")
 
         validated_data["user"] = request.user
         validated_data["task"] = task
@@ -182,8 +162,6 @@ class CommentSerializer(serializers.ModelSerializer):
         request = self.context.get("request")
 
         if instance.user != request.user and not request.user.is_superuser:
-            raise PermissionDenied(
-                "Verboten. Du kannst nur deine eigenen Kommentare bearbeiten."
-            )
+            raise PermissionDenied("Verboten. Du kannst nur deine eigenen Kommentare bearbeiten.")
 
         return super().update(instance, validated_data)
