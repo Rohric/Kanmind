@@ -7,7 +7,7 @@ from board_app.models import Board, BoardMembership
 from task_app.models import Comment, Task
 
 # Muss zu GUEST_LOGIN in frontend/shared/js/config.js passen.
-DEMO_EMAIL = "kevin@kovacsi.de"
+DEMO_EMAIL = "guest@kanmind.de"
 DEMO_PASSWORD = "asdasdasd"
 DEMO_FULLNAME = "Guest User"
 
