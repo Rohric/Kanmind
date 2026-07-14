@@ -9,3 +9,16 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
+
+class DemoResetState(models.Model):
+    """
+    Singleton (pk=1): merkt sich, wann der Demo-Account zuletzt
+    zurückgesetzt wurde. Wird von der DemoResetMiddleware gelesen und
+    vom reset_demo-Command aktualisiert.
+    """
+
+    last_reset = models.DateTimeField()
+
+    def __str__(self):
+        return f"Letzter Demo-Reset: {self.last_reset:%d.%m.%Y %H:%M}"

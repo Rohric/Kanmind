@@ -1,9 +1,11 @@
 from django.contrib.auth.models import User
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from board_app.models import Board
 from task_app.models import Comment, Task
+from user_auth_app.models import DemoResetState
 
 from .seed_demo import DEMO_EMAIL
 
@@ -29,4 +31,8 @@ class Command(BaseCommand):
             )
 
         call_command("seed_demo")
+
+        DemoResetState.objects.update_or_create(
+            pk=1, defaults={"last_reset": timezone.now()}
+        )
         self.stdout.write(self.style.SUCCESS("Demo-Account frisch zurückgesetzt."))
