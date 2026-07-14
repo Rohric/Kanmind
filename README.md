@@ -1,6 +1,6 @@
-# Kanban Board API
+# KanMind — Kanban Board
 
-A REST API backend for a Kanban-style project management application, built with Django and Django REST Framework. It supports multi-user boards, task management with priorities and statuses, comments, and token-based authentication.
+A full-stack Kanban project management application: a REST API backend built with Django and Django REST Framework, plus a static HTML/CSS/JS frontend. It supports multi-user boards, task management with priorities and statuses, comments, token-based authentication, and a self-resetting demo account for trying the app without registration.
 
 ---
 
@@ -9,7 +9,9 @@ A REST API backend for a Kanban-style project management application, built with
 - [Project Structure](#project-structure)
 - [Setup & Installation](#setup--installation)
 - [Environment Variables & Secret Key](#environment-variables--secret-key)
-- [Running the Server](#running-the-server)
+- [Running the Backend](#running-the-backend)
+- [Running the Frontend](#running-the-frontend)
+- [Demo Account (Guest Login)](#demo-account-guest-login)
 - [Authentication & User Workflow](#authentication--user-workflow)
 - [API Reference](#api-reference)
 - [Data Models](#data-models)
@@ -19,17 +21,22 @@ A REST API backend for a Kanban-style project management application, built with
 ## Project Structure
 
 ```
-backend/
-├── core/                   # Project settings, root URLs
-├── board_app/              # Boards and memberships
-│   └── api/                # Serializers, views, permissions, URLs
-├── task_app/               # Tasks and comments
-│   └── api/
-├── user_auth_app/          # Registration, login, user profiles
-│   └── api/
-├── .env                    # Secret keys & local config (never commit this)
-├── .env.template           # Template with placeholder values
-└── manage.py
+Kanmind/
+├── backend/
+│   ├── core/               # Project settings, root URLs
+│   ├── board_app/          # Boards and memberships
+│   │   └── api/            # Serializers, views, permissions, URLs
+│   ├── task_app/           # Tasks and comments
+│   │   └── api/
+│   ├── user_auth_app/      # Registration, login, user profiles,
+│   │   └── api/            #   demo seed/reset commands & middleware
+│   ├── .env                # Secret keys & local config (never commit this)
+│   ├── .env.template       # Template with placeholder values
+│   └── manage.py
+└── frontend/
+    ├── index.html          # Entry point (redirects to login/dashboard)
+    ├── pages/              # Auth, dashboard, boards, board detail
+    └── shared/             # API client, auth helpers, config, styles
 ```
 
 ---
@@ -102,13 +109,50 @@ SECRET_KEY=your-secret-key-here
 
 ---
 
-## Running the Server
+## Running the Backend
 
 ```bash
 python manage.py runserver
 ```
 
 The API will be available at `http://127.0.0.1:8000/`.
+
+---
+
+## Running the Frontend
+
+The frontend is a static site — no build step, no npm. It just needs to be served over HTTP (opening the files directly via `file://` won't work, because the browser blocks `fetch` calls from local files).
+
+**Option A — VS Code Live Server:** right-click `frontend/index.html` → *Open with Live Server*.
+
+**Option B — Python:**
+```bash
+cd frontend
+python -m http.server 5500
+```
+
+Then open `http://127.0.0.1:5500`. The entry page redirects to the login or dashboard automatically.
+
+> **Note:** The backend only accepts requests from the origins listed in `CORS_ALLOWED_ORIGINS` (`backend/core/settings.py`) — by default `http://127.0.0.1:5500` and `http://localhost:5500`. If you serve the frontend on a different port, add it there.
+>
+> The API base URL the frontend talks to is set in `frontend/shared/js/config.js` (`API_BASE_URL`).
+
+---
+
+## Demo Account (Guest Login)
+
+The login page has a **Guest Log In** button so anyone can explore the app without registering. It signs in as a shared demo user (`guest@kanmind.de`) whose board is pre-filled with realistic tasks and comments.
+
+**Self-resetting:** the demo account cleans up after itself. A middleware (`user_auth_app/middleware.py`) checks on incoming requests whether the last reset is older than **20 minutes** — if so, all guest data is deleted and freshly re-seeded. Registered users are never touched by this.
+
+The demo data is also available as management commands:
+
+```bash
+python manage.py seed_demo    # create demo user + board + tasks (idempotent)
+python manage.py reset_demo   # wipe all guest data and re-seed it
+```
+
+On a fresh database you don't need to run anything — the middleware seeds the demo account automatically on the first request.
 
 ---
 
