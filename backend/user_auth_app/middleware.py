@@ -7,22 +7,22 @@ from django.utils import timezone
 
 logger = logging.getLogger(__name__)
 
-# So lange darf der Guest wüten, bevor aufgeräumt wird.
+# How long the guest may play around before the account gets cleaned up.
 RESET_INTERVAL = timedelta(minutes=20)
 
-# DB-Abfrage höchstens einmal pro Minute statt bei jedem Request.
+# Hit the database at most once per minute instead of on every request.
 CHECK_EVERY_SECONDS = 60
 
 
 class DemoResetMiddleware:
     """
-    Setzt den Demo-Account (Guest-Login) automatisch zurück, sobald der
-    letzte Reset länger als RESET_INTERVAL her ist.
+    Automatically resets the demo account (guest login) once the last
+    reset is older than RESET_INTERVAL.
 
-    Läuft huckepack auf eingehenden Requests statt über einen externen
-    Scheduler — funktioniert damit identisch unter runserver, Gunicorn
-    und im Docker-Container, ohne Cron. Wenn niemand die Seite besucht,
-    gibt es auch nichts aufzuräumen.
+    Piggybacks on incoming requests instead of relying on an external
+    scheduler - this works identically under runserver, Gunicorn and
+    inside a Docker container, without cron. If nobody visits the site,
+    there is nothing to clean up either.
     """
 
     def __init__(self, get_response):
@@ -42,8 +42,8 @@ class DemoResetMiddleware:
         try:
             self._reset_if_due()
         except Exception:
-            # Der Demo-Reset darf niemals echte Requests kaputt machen.
-            logger.exception("Demo-Reset fehlgeschlagen")
+            # The demo reset must never break a real request.
+            logger.exception("Demo reset failed")
 
     def _reset_if_due(self):
         from user_auth_app.models import DemoResetState
@@ -52,7 +52,7 @@ class DemoResetMiddleware:
             pk=1, defaults={"last_reset": timezone.now()}
         )
         if created:
-            # Erster Start: Demo-Daten anlegen, Intervall beginnt jetzt.
+            # First start: create the demo data, the interval starts now.
             call_command("seed_demo")
             return
 

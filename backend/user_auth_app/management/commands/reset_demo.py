@@ -12,22 +12,22 @@ from .seed_demo import DEMO_EMAIL
 
 class Command(BaseCommand):
     help = (
-        "Setzt den Demo-Account (Guest-Login) zurück: löscht alle Demo-Daten "
-        "und seedet sie neu. Registrierte User bleiben unangetastet. "
-        "Gedacht für einen Cron-Aufruf alle ~20 Minuten."
+        "Resets the demo account (guest login): deletes all demo data "
+        "and seeds it again. Registered users are left untouched. "
+        "Triggered by DemoResetMiddleware roughly every 20 minutes."
     )
 
     def handle(self, *args, **options):
         demo_user = User.objects.filter(username=DEMO_EMAIL).first()
 
         if demo_user:
-            # Cascade räumt Memberships, Tasks und Comments der Demo-Boards mit ab.
+            # Cascade removes memberships, tasks and comments of the demo boards.
             boards_deleted, _ = Board.objects.filter(owner=demo_user).delete()
-            # Spuren des Guests außerhalb seiner eigenen Boards.
+            # Traces the guest may have left outside their own boards.
             tasks_deleted, _ = Task.objects.filter(creator=demo_user).delete()
             comments_deleted, _ = Comment.objects.filter(user=demo_user).delete()
             self.stdout.write(
-                f"Demo-Daten gelöscht ({boards_deleted + tasks_deleted + comments_deleted} Objekte)."
+                f"Demo data deleted ({boards_deleted + tasks_deleted + comments_deleted} objects)."
             )
 
         call_command("seed_demo")
@@ -35,4 +35,4 @@ class Command(BaseCommand):
         DemoResetState.objects.update_or_create(
             pk=1, defaults={"last_reset": timezone.now()}
         )
-        self.stdout.write(self.style.SUCCESS("Demo-Account frisch zurückgesetzt."))
+        self.stdout.write(self.style.SUCCESS("Demo account freshly reset."))

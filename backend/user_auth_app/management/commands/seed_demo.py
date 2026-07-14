@@ -6,7 +6,7 @@ from django.core.management.base import BaseCommand
 from board_app.models import Board, BoardMembership
 from task_app.models import Comment, Task
 
-# Muss zu GUEST_LOGIN in frontend/shared/js/config.js passen.
+# Must match GUEST_LOGIN in frontend/shared/js/config.js.
 DEMO_EMAIL = "guest@kanmind.de"
 DEMO_PASSWORD = "asdasdasd"
 DEMO_FULLNAME = "Guest User"
@@ -15,50 +15,50 @@ DEMO_BOARD_TITLE = "Demo Board"
 
 DEMO_TASKS = [
     {
-        "title": "Projektstruktur aufsetzen",
-        "description": "Django-Projekt mit board_app, task_app und user_auth_app anlegen.",
+        "title": "Set up project structure",
+        "description": "Create the Django project with board_app, task_app and user_auth_app.",
         "status": "done",
         "priority": "low",
         "due_in_days": -3,
     },
     {
-        "title": "Token-Login implementieren",
-        "description": "Registration und Login über DRF-TokenAuthentication bereitstellen.",
+        "title": "Implement token login",
+        "description": "Provide registration and login via DRF token authentication.",
         "status": "done",
         "priority": "medium",
         "due_in_days": -1,
     },
     {
-        "title": "REST-API dokumentieren",
-        "description": "Alle Endpoints mit Beispiel-Requests im README beschreiben.",
+        "title": "Document the REST API",
+        "description": "Describe all endpoints with example requests in the README.",
         "status": "review",
         "priority": "high",
         "due_in_days": 2,
     },
     {
-        "title": "Drag & Drop testen",
-        "description": "Tasks zwischen den Spalten verschieben und Statuswechsel prüfen.",
+        "title": "Test drag & drop",
+        "description": "Move tasks between columns and verify the status changes.",
         "status": "in-progress",
         "priority": "high",
         "due_in_days": 4,
     },
     {
-        "title": "Dashboard-Statistiken bauen",
-        "description": "Task-Zähler und nächste Deadline auf dem Dashboard anzeigen.",
+        "title": "Build dashboard statistics",
+        "description": "Show task counters and the next deadline on the dashboard.",
         "status": "in-progress",
         "priority": "medium",
         "due_in_days": 7,
     },
     {
-        "title": "Deployment vorbereiten",
-        "description": "Docker-Setup mit PostgreSQL und Nginx für den Hetzner-Server bauen.",
+        "title": "Prepare deployment",
+        "description": "Build the Docker setup with PostgreSQL and Nginx for the Hetzner server.",
         "status": "to-do",
         "priority": "high",
         "due_in_days": 10,
     },
     {
-        "title": "Feedback einarbeiten",
-        "description": "Rückmeldungen aus dem Code-Review sichten und umsetzen.",
+        "title": "Incorporate feedback",
+        "description": "Review and address the notes from the code review.",
         "status": "to-do",
         "priority": "low",
         "due_in_days": 14,
@@ -66,15 +66,15 @@ DEMO_TASKS = [
 ]
 
 DEMO_COMMENTS = {
-    "REST-API dokumentieren": [
-        "Die Auth-Endpoints sind schon beschrieben, Boards fehlen noch.",
-        "Denk an ein Beispiel für den Token-Header!",
+    "Document the REST API": [
+        "The auth endpoints are already covered, boards are still missing.",
+        "Don't forget an example for the token header!",
     ],
 }
 
 
 class Command(BaseCommand):
-    help = "Erstellt den Demo-User (Guest-Login) mit Board, Tasks und Comments. Idempotent."
+    help = "Creates the demo user (guest login) with board, tasks and comments. Idempotent."
 
     def handle(self, *args, **options):
         demo_user, created = User.objects.get_or_create(
@@ -84,21 +84,21 @@ class Command(BaseCommand):
         if created:
             demo_user.set_password(DEMO_PASSWORD)
             demo_user.save()
-            self.stdout.write(f"Demo-User angelegt: {DEMO_EMAIL}")
+            self.stdout.write(f"Demo user created: {DEMO_EMAIL}")
         elif demo_user.first_name != DEMO_FULLNAME:
             demo_user.first_name = DEMO_FULLNAME
             demo_user.save()
-            self.stdout.write(f"Demo-User umbenannt in: {DEMO_FULLNAME}")
+            self.stdout.write(f"Demo user renamed to: {DEMO_FULLNAME}")
 
         board, board_created = Board.objects.get_or_create(
             owner=demo_user, title=DEMO_BOARD_TITLE
         )
-        # Ohne Membership filtert BoardsList.get_queryset() das Board weg.
+        # Without a membership, BoardsList.get_queryset() filters the board out.
         BoardMembership.objects.get_or_create(
             user=demo_user, board=board, defaults={"role": "owner"}
         )
         if board_created:
-            self.stdout.write(f"Board angelegt: {DEMO_BOARD_TITLE}")
+            self.stdout.write(f"Board created: {DEMO_BOARD_TITLE}")
 
         today = date.today()
         tasks_created = 0
@@ -131,7 +131,7 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                f"Demo-Daten bereit ({tasks_created} Tasks, "
-                f"{comments_created} Comments neu angelegt)."
+                f"Demo data ready ({tasks_created} tasks, "
+                f"{comments_created} comments newly created)."
             )
         )
