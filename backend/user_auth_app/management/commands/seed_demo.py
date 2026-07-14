@@ -9,7 +9,7 @@ from task_app.models import Comment, Task
 # Muss zu GUEST_LOGIN in frontend/shared/js/config.js passen.
 DEMO_EMAIL = "kevin@kovacsi.de"
 DEMO_PASSWORD = "asdasdasd"
-DEMO_FULLNAME = "Kevin Kovacsi"
+DEMO_FULLNAME = "Guest User"
 
 DEMO_BOARD_TITLE = "Demo Board"
 
@@ -85,6 +85,10 @@ class Command(BaseCommand):
             demo_user.set_password(DEMO_PASSWORD)
             demo_user.save()
             self.stdout.write(f"Demo-User angelegt: {DEMO_EMAIL}")
+        elif demo_user.first_name != DEMO_FULLNAME:
+            demo_user.first_name = DEMO_FULLNAME
+            demo_user.save()
+            self.stdout.write(f"Demo-User umbenannt in: {DEMO_FULLNAME}")
 
         board, board_created = Board.objects.get_or_create(
             owner=demo_user, title=DEMO_BOARD_TITLE
