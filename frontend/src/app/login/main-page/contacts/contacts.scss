@@ -1,0 +1,140 @@
+@use '../../../styles/colors.scss';
+@use '../../../styles/global-styles.scss';
+
+.contact_section {
+  display: flex;
+  @media (max-width: 1050px) {
+    display: block;
+  }
+}
+
+.list_contact {
+  @media (max-width: 1050px) {
+    &.d_none_mobile {
+      display: none;
+    }
+  }
+}
+
+.single_contact {
+  padding-left: 64px;
+  width: 100%;
+
+  @media (max-width: 1250px) {
+    padding-left: 36px;   
+  }
+
+  @media (max-width: 1050px) {
+    display: none;
+    padding-left: 16px;
+    padding-right: 16px;
+    position: relative;
+    &.d_block {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+  }
+}
+
+.sc_header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 30px;
+  width: fit-content;
+  margin-top: 50px;  
+
+  > div {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+  }
+
+  h1 {
+    background: transparent;
+    font-size: 52px;
+
+    @media (max-width: 1250px) {
+      font-size: 40px;
+    }
+  }
+
+  p {
+    font-size: 24px;
+    font-weight: 400;
+
+    @media (max-width: 1250px) {
+      font-size: 20px;
+    }
+  }
+
+  .d_none {
+    display: none;
+  }
+
+  @media (max-width: 1250px) {
+      gap: 20px;
+  }
+
+  @media (max-width: 1050px) {
+    display: flex;
+    flex-direction: row;
+    align-items: start;
+    margin-top: 25px;
+    gap: 0;
+    justify-content: space-between;
+    width: 100%;
+
+    > div {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .seperator {
+      display: none;
+    }
+
+    .seperator.d_none {
+      display: block;
+      width: 90px;
+      height: 3px;
+      background-color: colors.$buttonBlue;
+      border: none;
+      margin: 8px 0;
+    }
+
+    p {
+      font-size: 20px;
+      font-weight: 400;
+    }
+  }
+}
+
+.seperator {
+  height: 59px;
+  border: 2px solid colors.$buttonBlue;
+}
+
+.seperator_contacts {
+  height: 1px;
+  background-color: colors.$bgMiddleGrey;
+}
+
+.return_button {
+  display: none;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  img {
+    width: 32px;
+    height: 32px;
+  }
+  @media (max-width: 1050px) {
+    display: block;
+    position: absolute;
+    right: 16px;
+    top: 40px;
+  }
+}

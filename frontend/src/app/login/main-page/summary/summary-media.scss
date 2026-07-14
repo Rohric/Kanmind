@@ -1,0 +1,189 @@
+@use '../../../styles/colors.scss';
+
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@media (max-width: 1200px) {
+  .area_site {
+    .greeting { font-size: 38px; }
+    .name { font-size: 50px; }
+  }
+}
+
+@media (max-width: 1050px) {
+
+  .overlay {
+    position: fixed;
+    inset: 0;
+    height: 100dvh;
+    @include flex-center;
+    flex-direction: column;
+    text-align: center;
+    background-color: white;
+    opacity: 1;
+    transition: opacity 1s ease;
+    z-index: 9999;
+    pointer-events: auto;
+
+    &.hidden {
+      opacity: 0;
+      pointer-events: none;
+    }
+  }
+
+  .summary {
+    padding: 32px 16px;
+
+    &-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 28px;
+
+      .headline {
+        font-size: 47px;
+        margin: 0;
+        order: 1;
+      }
+
+      .slogan {
+        font-size: 20px;
+        margin: 0;
+        order: 2;
+      }
+
+      .divider {
+        display: block;
+        width: 90px;
+        height: 3px;
+        background-color: colors.$buttonBlue;
+        border: none;
+        border-radius: 0;
+        margin-top: 8px;
+        order: 3;
+      }
+    }
+  }
+
+  .area_summary {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    gap: 24px;
+
+    > section {
+      width: 100%;
+      gap: 16px;
+    }
+  }
+
+  .area_top {
+    gap: 16px;
+
+    .box_top {
+      height: 90px;
+
+      .symbol {
+        width: 40px;
+        height: 40px;
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+
+      p {
+        .task_number { font-size: 40px; }
+        .task_area { font-size: 14px; }
+      }
+    }
+  }
+
+  .area_mid {
+    .box_urgent {
+      height: 90px;
+      padding: 16px;
+      gap: 16px;
+
+      .urgent_left {
+        gap: 16px;
+
+        .symbol {
+          width: 40px;
+          height: 40px;
+
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        p {
+          .task_number { font-size: 40px; }
+          .task_area { font-size: 14px; }
+        }
+      }
+
+      .divider {
+        height: 60px;
+      }
+    }
+  }
+
+  .area_bot {
+    gap: 16px;
+
+    .box_task_bord,
+    .box_task_progress,
+    .box_task_feedback {
+      height: 90px;
+
+      p {
+        .task_number { font-size: 40px; }
+        .span1,
+        .span2 {
+          font-size: 14px;
+          text-align: center;
+        }
+      }
+    }
+  }
+
+  .area_site {
+    display: none;
+  }
+}
+
+@media (max-width: 650px) {
+  .area_summary {
+    > section {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .summary {
+    padding: 60px 24px 24px;
+
+    &-header {
+      .headline { font-size: 34px; }
+      .slogan { font-size: 18px; }
+    }
+  }
+
+  .area_summary {
+    align-items: center;
+  }
+}
+
+@media (max-height: 620px) {
+  .summary-header {
+    flex-direction: row;
+    align-items: center;
+  }
+}

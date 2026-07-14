@@ -1,0 +1,58 @@
+<section>
+  <main [class.guest-nav]="!(user$ | async)">
+    <div>
+      <img class="join_logo_nav" src="img/Capa_1.png" alt="" />
+      @if (user$ | async) {
+      <nav>
+        <a
+          routerLink="/summary"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ><img src="img/summary-Icon.png" alt="" />Summary
+        </a>
+        <a
+          routerLink="/add-task"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ><img src="img/add-task-icon.png" alt="" />Add Task</a
+        >
+        <a
+          routerLink="/board"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ><img src="img/board-icon.png" alt="" />Board</a
+        >
+        <a
+          routerLink="/contacts"
+          routerLinkActive="active-link"
+          [routerLinkActiveOptions]="{ exact: true }"
+          ><img src="img/contact-icon.png" alt="" />Contacts</a
+        >
+      </nav>
+      } @else {
+      <nav>
+        <a routerLink="/Login"
+          ><img src="img/login.svg" alt="" />Log in</a>
+      </nav>
+      }
+    </div>
+
+    <div class="Legal">
+      <a
+        routerLink="/Privacy Policy"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >Privacy Policy</a
+      >
+      <a
+        routerLink="/Legal notice"
+        routerLinkActive="active-link"
+        [routerLinkActiveOptions]="{ exact: true }"
+        >Legal notice</a
+      >
+    </div>
+  </main>
+</section>
+
+
+ 

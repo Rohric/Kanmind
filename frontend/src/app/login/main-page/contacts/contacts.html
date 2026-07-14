@@ -1,0 +1,24 @@
+<section class="contact_section">
+  <article class="list_contact" [class.d_none_mobile]="selectedContactId()">
+    <app-list-contact (contactSelected)="setSelectedContact($event)"> </app-list-contact>
+  </article>
+
+  <article class="single_contact" [class.d_block]="selectedContactId()">
+    <header class="sc_header">
+      <div>
+        <h1>Contacts</h1>
+        <div class="seperator"></div>
+        <p>Better with a team</p>
+        <div class="seperator d_none"></div>
+      </div>
+
+      <button class="return_button" (click)="returnArrow()" aria-label="Button back to contact-list">
+        <img src="img/arrow_left.svg" alt="" />
+      </button>
+    </header>
+
+    <div class="contact_view">
+      <app-single-contact *ngIf="selectedContactId()" [contactId]="selectedContactId()!"></app-single-contact>
+    </div>
+  </article>
+</section>

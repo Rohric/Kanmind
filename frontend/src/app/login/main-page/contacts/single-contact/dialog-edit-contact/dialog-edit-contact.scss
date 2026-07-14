@@ -1,0 +1,301 @@
+@use '../../../../../styles/colors.scss';
+
+.mid_side {
+  display: flex;
+  align-items: center;
+  margin: 0 40px;
+}
+
+:host ::ng-deep app-dialog {
+  .dialog {
+    background: colors.$white;
+    border-radius: 30px;
+    overflow: hidden; // clippt die Rundung
+    max-width: calc(100vw - 40px);
+    max-height: calc(100vh - 120px);
+  }
+
+  .sc_dialog {
+    max-width: 1212px;
+    height: 590px;
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    margin: 0;
+    padding: 0;
+    gap: 20px;
+
+    .close {
+      top: 48px;
+      right: 48px;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: transparent;
+      position: absolute;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+
+
+      &:hover {
+        background-color: colors.$bgMiddleGrey;
+        transition: background-color 150ms ease-in-out;
+      }
+
+      img {
+        width: 14px;
+        height: 14px;
+        top: 9px;
+        left: 9px;
+        pointer-events: none;
+      }
+    }
+  }
+
+  .left_side {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    width: 480px;
+    background-color: colors.$bgGrey;
+    padding: 60px 40px 60px 40px;
+
+    .seperator {
+      height: 0px;
+      width: 90px;
+      border-bottom: 3px solid colors.$buttonBlue;
+      margin-top: 20px;
+    }
+
+    img {
+      height: 64px;
+      width: 52px;
+    }
+
+    span {
+      font-size: 60px;
+      font-weight: 700;
+      color: colors.$white;
+      margin-top: 32px;
+    }
+
+    p {
+      font-size: 27px;
+      font-weight: 700;
+      color: colors.$white;
+      margin-top: 32px;
+    }
+  }
+
+  .mid_side {
+    display: flex;
+    align-items: center;
+    margin: 0 0px;
+
+    .sc_logo,
+    img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 3px solid colors.$white;
+      box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.1);
+      object-fit: cover;
+      background-color: colors.$bgGrey;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 47px;
+      font-weight: 500;
+      color: colors.$white;
+    }
+  }
+
+  .right_side {
+    background: colors.$white;
+    padding: 60px 60px 50px 0px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 32px;
+  }
+
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+
+    label {
+      border: 1px solid colors.$bgMiddleGrey;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 10px;
+      padding: 13px 21px;
+      width: 420px;
+      transition: border-color 150ms ease;
+
+      &:hover {
+        border-color: colors.$buttonBlue;
+      }
+
+      &:has(input.ng-invalid) {
+        border-color: colors.$errorRed;
+      }
+
+      input {
+        border: none;
+        font-size: 20px;
+        font-weight: 400;
+        flex: 1;
+
+        &:focus {
+          outline: none;
+        }
+      }
+
+      img {
+        height: 24px;
+        width: 24px;
+      }
+    }
+
+    .error_msg {
+      color: colors.$errorRed;
+      font-size: 14px;
+      margin-top: -20px;
+      margin-left: 4px;
+    }
+  }
+
+  .dialog_buttons {
+    display: flex;
+    gap: 24px;
+    white-space: nowrap;
+
+    .button_light {
+      width: auto;
+      background-color: colors.$white;
+      border: 1px solid colors.$bgGrey;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      gap: 8px;
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .button_dark {
+      width: auto;
+      border-radius: 16px;
+      background-color: colors.$bgGrey;
+      color: colors.$white;
+      display: flex;
+      align-items: center;
+      justify-content: space-evenly;
+      gap: 8px;
+
+      svg {
+        width: 16px;
+        height: 16px;
+      }
+    }
+
+    .button_light:hover {
+      color: colors.$buttonBlue;
+      border-color: colors.$buttonBlue;
+      transition: background-color 150ms ease-in-out;
+      cursor: pointer;
+    }
+
+    .button_dark:hover {
+      background-color: colors.$buttonBlue;
+      border-color: colors.$buttonBlue;
+      color: colors.$white;
+      transition: background-color 150ms ease-in-out;
+      cursor: pointer;
+    }
+  }
+}
+
+@media (max-width: 1200px) {
+  :host ::ng-deep app-dialog {
+    .left_side { width: 360px; }
+    .left_side span { font-size: 40px; }
+    .left_side p { font-size: 20px; }
+    .mid_side {
+      font-size: 20px;
+      margin: -60px 0px 0px 0px;
+      z-index: 10;
+    }
+  }
+}
+
+@media (max-width: 1050px) {
+  :host ::ng-deep app-dialog {
+    .sc_dialog {
+      flex-direction: column;
+      height: auto;
+      align-items: center;
+    }
+    .sc_dialog .close:hover { display: none; }
+    .sc_dialog .close {
+      top: 24px;
+      right: 24px;
+      color: colors.$white;
+      z-index: 11;
+      .active {
+        background-color: colors.$buttonBlue;
+        transition: background-color 150ms ease-in-out;
+      }
+    }
+    .left_side {
+      width: 100%;
+      padding: 80px 40px 80px 40px;
+      z-index: 10;
+      img { display: none; }
+    }
+    .right_side {
+      width: 100%;
+      padding: 40px 20px;
+      align-items: center;
+    }
+  }
+}
+
+@media (max-width: 500px) {
+  :host ::ng-deep app-dialog {
+    .left_side { padding: 40px 24px; }
+    .left_side .seperator { width: 60px; margin-top: 5px; }
+    .left_side span { font-size: 32px; }
+    .left_side p { font-size: 16px; }
+    .mid_side {
+      font-size: 10px;
+      margin: -60px 0px 0px 0px;
+      z-index: 10;
+    }
+    .mid_side .sc_logo, .mid_side img {
+      width: 80px;
+      height: 80px;
+      font-size: 32px;
+    }
+    .right_side { padding: 20px 16px; gap: 10px; }
+    form label { width: 100%; padding: 6px 10px; }
+    form label input { font-size: 12px; }
+    .dialog_buttons { gap: 12px; }
+    .dialog_buttons .button_light, .dialog_buttons .button_dark {
+      font-size: 10px;
+      font-weight: 400;
+      width: 90px;
+      padding: 0px 4px;
+      gap: 1px;
+    }
+    .dialog_buttons .button_dark { justify-content: center; }
+    .dialog_buttons .button_light svg, .dialog_buttons .button_dark svg { width: 10px; height: 10px; }
+  }
+}

@@ -1,0 +1,163 @@
+@use '../../../../styles/colors.scss';
+
+:host {
+  display: block;
+  width: 100%;
+}
+
+.task_preview {
+  background: colors.$white;
+  border-radius: 16px;
+  padding: 16px;
+  width: 270px;
+  height: 220px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  cursor: grab;
+
+  @media (max-width: 1440px) {
+    width: 240px;
+  }
+
+  @media (max-width: 1320px) {
+    width: 200px;
+  }
+
+  @media (max-width: 1170px) {
+    width: 170px;
+  }
+
+  @media (max-width: 1050px) {
+    width: 270px;    
+  }
+}
+
+.task_type_badge {
+  width: fit-content;
+  margin-bottom: 4px;
+
+  img {
+    height: 24px;
+    display: block;
+  }
+}
+
+.task_title {
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0;
+}
+
+.task_content {
+  font-size: 16px;
+  color: colors.$bgMiddleGrey;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-word;
+}
+
+.area_progress {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.progress_bar {
+  flex: 1;
+  height: 6px;
+  background: colors.$bgMiddleGrey;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress_fill {
+  height: 100%;
+  background: colors.$pbBlue;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.progress_text {
+  font-size: 16px;
+  color: colors.$navActive;
+  white-space: nowrap;
+}
+
+.task_footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.area_assigns {
+  display: grid;
+  grid-template-columns: repeat(9, auto);
+  min-height: 28px;
+
+  @media (max-width: 1320px) {
+    grid-template-columns: repeat(7, auto);
+  }
+
+  @media (max-width: 1170px) {
+    grid-template-columns: repeat(5, auto);
+  }
+}
+
+.assign_avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  color: colors.$white;
+  font-size: 13px;
+  font-weight: 400;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid colors.$white;
+  margin-left: -8px;
+}
+
+.area_prio {
+  display: flex;
+  align-items: center;
+}
+
+.assign_more {
+  position: relative;
+  background-color: colors.$bgMiddleGrey;
+  color: colors.$white;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
+
+  &:after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+  }
+}
+
+.prio_icon {
+  width: 20px;
+  height: auto;
+}
+
+.prio_icon.urgent {
+  color: colors.$errorRed;
+}
+
+.prio_icon.medium {
+  color: colors.$bgYellow;
+}
+
+.prio_icon.low {
+  color: colors.$bgGreen;
+}

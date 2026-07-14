@@ -1,0 +1,95 @@
+<div class="overlay-container">
+  <div class="widescreen"></div>
+  <img class="join_logo" src="img/Capa 2.svg" alt="" />
+</div>
+<section class="login_page" [class.sign-up-mode]="isSignUp">
+  <header>
+    <div class="header_right" *ngIf="!isSignUp">
+      <p>Not a Join User?</p>
+      <button class="button_dark" (click)="openSignUp()">Sign Up</button>
+    </div>
+  </header>
+  <div class="main_contend">
+    <div class="middle_area">
+      <div class="headline" *ngIf="!isSignUp">
+        <h1>Log in</h1>
+        <span class="underline"></span>
+        <div class="inputs">
+          <div class="input_wrapper" [class.error-border]="loginError">
+            <input placeholder="Email" [(ngModel)]="email" type="email" />
+            <img src="img/mail.svg" alt="" />
+          </div>
+
+          <div class="input_wrapper" [class.error-border]="loginError">
+            <input placeholder="Password" type="password" [(ngModel)]="password" />
+            <img src="img/lock.svg" alt="" />
+          </div>
+
+          <div class="error-text" *ngIf="loginError">
+            Check your email and password. Please try again.
+          </div>
+
+          <div class="middle_bottom_area">
+            <button class="button_dark" (click)="login()">Log In</button>
+            <button class="button_light" type="button" (click)="guestLogin()">Guest Log In</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="headline" *ngIf="isSignUp">
+        <div class="sign_up_arrow_container">
+          <img src="img/arrow_left.svg" alt="" (click)="openSignUp()" />
+          <h1>Sign up</h1>
+        </div>
+        <span class="underline"></span>
+        <div class="inputs">
+          <div class="input_wrapper" [class.error-border]="nameError">
+            <input placeholder="Name" [(ngModel)]="name" />
+            <img src="img/person.svg" alt="" />
+          </div>
+          <div class="error-text" *ngIf="nameError">Name is required</div>
+
+          <div class="input_wrapper" [class.error-border]="emailError || invalidEmailError">
+            <input placeholder="Email" type="email" [(ngModel)]="email" />
+            <img src="img/mail.svg" alt="" />
+          </div>
+          <span class="error-text" *ngIf="emailError">Email is required</span>
+          <span class="error-text" *ngIf="invalidEmailError">Enter a valid email</span>
+          <span class="error-text" *ngIf="emailTakenError">Email is already in Use</span>
+
+          <div class="input_wrapper" [class.error-border]="passwordError || passwordTooShortError|| emailTakenError">
+            <input placeholder="Password" type="password" [(ngModel)]="password" />
+            <img src="img/lock.svg" alt="" />
+          </div>
+          <span class="error-text" *ngIf="passwordError">Passwort is required</span>
+          <span class="error-text" *ngIf="passwordTooShortError">Password must be at least 6 characters</span>
+          
+
+          <div class="input_wrapper" [class.error-border]="passwordMatchError">
+            <input placeholder="Confirm Password" type="password" [(ngModel)]="confirmPassword" />
+            <img src="img/lock.svg" alt="" />
+          </div>
+
+          <div class="error-text" *ngIf="passwordMatchError">
+            Your passwords don't match. Please try again.
+          </div>
+
+          <div class="sign_up_bottom">
+            <div class="policy_text">
+              <input type="checkbox" [(ngModel)]="agreed" />
+              <span>
+                I accept the
+                <a routerLink="/Privacy Policy" class="policy">Privacy Policy</a>
+              </span>
+            </div>
+            <button class="button_dark" [disabled]="!agreed" (click)="signup()">Sign up</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <footer class="login_footer">
+    <a routerLink="/Privacy Policy">Privacy Policy</a>
+    <a routerLink="/Legal notice">Legal notice</a>
+  </footer>
+</section>

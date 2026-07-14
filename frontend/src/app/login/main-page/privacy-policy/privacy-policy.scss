@@ -1,0 +1,70 @@
+@use './../../../styles/colors.scss';
+@use './../../../styles/global-styles.scss';
+
+.privacy_policy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 35px; 
+  
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  max-height: calc(100vh - 96px); 
+  max-height: calc(100dvh - 96px);
+  padding-bottom: 40px;
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @media (max-width: 1050px) {
+    max-height: calc(100vh - 80px);
+    max-height: calc(100dvh - 80px);
+    padding-bottom: 100px;
+  }
+
+  h1 {
+    margin-bottom: 16px;
+    background: none;
+  }
+
+  article {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px; 
+  }
+
+  h2 {
+    font-size: 27px;
+    color: colors.$black;
+    margin: 0;
+    font-weight: 700;
+    background: none;
+  }
+
+  p {
+    font-size: 16px;
+    color: colors.$black;
+    margin: 0;
+    font-family: 'Inter';
+    font-weight: 400;
+  }
+}
+
+@media (max-width: 1050px) {
+  .privacy_policy {
+    gap: 24px;
+
+    h1 {
+      font-size: 40px;
+    }
+    h2 {
+      font-size: 22px;
+    }
+    p {
+      font-size: 14px;
+    }
+  }
+}
