@@ -1,20 +1,22 @@
 const GUEST_LOGIN = {
-    "email": "guest@kanmind.de",
-    "password": "asdasdasd"
-}
+  email: "guest@kanmind.de",
+  password: "asdasdasd",
+};
 
-const API_BASE_URL = 'http://127.0.0.1:8000/api/';
+const IS_LOCALHOST = ["127.0.0.1", "localhost"].includes(window.location.hostname);
 
-const LOGIN_URL = 'login/';
+const API_BASE_URL = IS_LOCALHOST ? "http://127.0.0.1:8000/api/" : "/api/";
 
-const REGISTER_URL = 'registration/';
+const LOGIN_URL = "login/";
 
-const BOARDS_URL = 'boards/';
+const REGISTER_URL = "registration/";
 
-const MAIL_CHECK_URL = 'email-check/';
+const BOARDS_URL = "boards/";
 
-const TASKS_URL = 'tasks/';
+const MAIL_CHECK_URL = "email-check/";
 
-const TASKS_ASSIGNED_URL = 'tasks/assigned-to-me/';
+const TASKS_URL = "tasks/";
 
-const TASKS_REVIEWER_URL = 'tasks/reviewing/';
+const TASKS_ASSIGNED_URL = "tasks/assigned-to-me/";
+
+const TASKS_REVIEWER_URL = "tasks/reviewing/";
